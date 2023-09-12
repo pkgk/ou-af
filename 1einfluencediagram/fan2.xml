@@ -1,0 +1,178 @@
+<?xml version="1.0" ?>
+
+<BIF VERSION="0.3">
+<NETWORK>
+
+<!-- NODES -->
+
+<!-- kansnode component Power -->
+<!-- power is werkend of niet -->
+<VARIABLE TYPE="nature">
+	<NAME>Power</NAME>
+	<PROPERTY>present</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<!-- kansnode Health van component Power -->
+<VARIABLE TYPE="nature">
+	<NAME>Health Power</NAME>
+	<PROPERTY>State</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<!-- kansnode testen component Power-->
+<VARIABLE TYPE="nature">
+	<NAME>Test Power</NAME>
+	<PROPERTY>present</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<!-- utility node vervangen van component power -->
+<VARIABLE TYPE="utility">
+	<NAME>UPowerReplace</NAME>
+	<PROPERTY>U</PROPERTY>
+	<OUTCOME>U(HPower, DPower)</OUTCOME>
+</VARIABLE>
+
+<!-- decision node vervangen component power -->
+<VARIABLE TYPE="decision">
+	<NAME>DPowerReplace</NAME>
+	<PROPERTY>Replace Power</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<!-- decision node voor testen van component power -->
+<VARIABLE TYPE="decision">
+	<NAME>DTestPower</NAME>
+	<PROPERTY>Test Power</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<!-- utility node voor testen component power -->
+<VARIABLE TYPE="utility">
+	<NAME>UTestPower</NAME>
+	<PROPERTY>U</PROPERTY>
+	<OUTCOME>U(HPower, DPower)</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>Shaft</NAME>
+	<PROPERTY>moving</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+
+<VARIABLE TYPE="nature">
+	<NAME>Blades</NAME>
+	<PROPERTY>moving</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+
+
+<VARIABLE TYPE="nature">
+	<NAME>AirOutlet</NAME>
+	<PROPERTY>present</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+
+
+
+
+
+
+<!-- Probability distributions -->
+
+
+<!-- werking van Power is afhankelijk van Health Power dus start met Health Power-->
+<!-- 1% kans dat power niet werkt -->
+<DEFINITION>
+	<FOR>Health Power</FOR>
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+
+<!-- werking van Power is afhankelijk van Health Power -->
+<!-- 1% kans dat power niet werkt -->
+<DEFINITION>
+	<FOR>Power</FOR>
+	<GIVEN>Health Power</GIVEN>
+	<TABLE>0.995 0.005 0.005 0.995</TABLE>
+</DEFINITION>
+
+
+<DEFINITION>
+	<FOR>Test Power</FOR>
+	<GIVEN>Health Power</GIVEN>
+	<TABLE>0.6 0 0.4 0 </TABLE>
+</DEFINITION>
+
+
+
+<DEFINITION>
+	<FOR>UPowerReplace</FOR>
+	<GIVEN>Health Power</GIVEN>
+	<TABLE>0.6 0.4 </TABLE>
+</DEFINITION>
+
+<DEFINITION>
+	<FOR>UPowerReplace</FOR>
+	<GIVEN>DPowerReplace</GIVEN>
+	<TABLE>0.6 0 0.4 0</TABLE>
+</DEFINITION>
+
+<DEFINITION>
+	<FOR>DPowerReplace</FOR>
+	<GIVEN>Test Power</GIVEN>
+	<TABLE>0.6 0 0.4 0</TABLE>
+</DEFINITION>
+
+
+
+<DEFINITION>
+	<FOR>Test Power</FOR>
+	<GIVEN>DTestPower</GIVEN>
+	<TABLE>0.6 0 0 0 0.4 0 0 0</TABLE>
+</DEFINITION>
+
+<DEFINITION>
+	<FOR>UTestPower</FOR>
+	<GIVEN>DTestPower</GIVEN>
+	<TABLE>0.6 0.4</TABLE>
+</DEFINITION>
+
+
+<DEFINITION>
+	<FOR>Shaft</FOR>
+	<GIVEN>Power</GIVEN>
+	<TABLE>0.6 0 0.4 0 </TABLE>
+</DEFINITION>
+
+
+
+<DEFINITION>
+	<FOR>Blades</FOR>
+	<GIVEN>Shaft</GIVEN>
+	<TABLE>0.9 0 0.1 0 </TABLE>
+</DEFINITION>
+
+
+
+<DEFINITION>
+	<FOR>AirOutlet</FOR>
+	<GIVEN>Blades</GIVEN>
+	<TABLE>0.99 0 0.01 0 </TABLE>
+</DEFINITION>
+
+
+
+</NETWORK>
+</BIF>
