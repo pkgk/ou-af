@@ -1,0 +1,6 @@
+more_itertools
+pyyed
+jpype1
+networkx
+bidict
+flask
