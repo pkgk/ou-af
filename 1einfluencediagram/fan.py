@@ -30,9 +30,12 @@ class Fan(Assembly):
 if __name__ == "__main__":
 
     fan = Fan(SYSTEM, "Fan")
+    printOverview(fan)
+
+
 #    viz.writeGraph(fan, alwaysShowConnectionNodes=True)
 #    bayesgen.writeNetwork(fan)
-    print(fan.blades.normal.relation)
-    print(fan.blades.failures[0].name)
-    print(fan.blades.failures[0].name)
+#    print(fan.blades.normal.relation)
+#    print(fan.blades.failures[0].name)
+#    print(fan.blades.failures[0].name)
 
