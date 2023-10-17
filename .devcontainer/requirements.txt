@@ -2,3 +2,4 @@ opsdroid
 pyagrum
 jupyter-server==1.23.5
 pytest_bdd
+deepdiff
