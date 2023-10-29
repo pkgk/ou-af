@@ -1,0 +1,175 @@
+<?xml version="1.0" ?>
+
+<BIF VERSION="0.3">
+<NETWORK>
+
+<!-- Variables -->
+<VARIABLE TYPE="nature">
+	<NAME>PresentLightOutputsLight</NAME>
+	<PROPERTY>PresentLightOutputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerInputsLight</NAME>
+	<PROPERTY>PresentPowerInputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthLight</NAME>
+	<PROPERTY>healthLight</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerOutputsSwitch</NAME>
+	<PROPERTY>PresentPowerOutputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerInputsSwitch</NAME>
+	<PROPERTY>PresentPowerInputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>EnabledStateInputsSwitch</NAME>
+	<PROPERTY>EnabledStateInputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthSwitch</NAME>
+	<PROPERTY>healthSwitch</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthWire</NAME>
+	<PROPERTY>healthWire</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="decision">
+	<NAME>DecisionReplaceLight</NAME>
+	<PROPERTY>DecisionReplaceLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="utility">
+	<NAME>UtilityReplaceLight</NAME>
+	<PROPERTY>UtilityReplaceLight</PROPERTY>
+	<OUTCOME>0</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="decision">
+	<NAME>DecisionReplaceSwitch</NAME>
+	<PROPERTY>DecisionReplaceSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="utility">
+	<NAME>UtilityReplaceSwitch</NAME>
+	<PROPERTY>UtilityReplaceSwitch</PROPERTY>
+	<OUTCOME>0</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="decision">
+	<NAME>DecisionTestObserveHealthLight</NAME>
+	<PROPERTY>DecisionTestObserveHealthLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="utility">
+	<NAME>UtilityTestObserveHealthLight</NAME>
+	<PROPERTY>UtilityTestObserveHealthLight</PROPERTY>
+	<OUTCOME>0</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>TestOutcomeTestObserveHealthLight</NAME>
+	<PROPERTY>TestOutcomeTestObserveHealthLight</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+	<OUTCOME>notdone</OUTCOME>
+</VARIABLE>
+
+<!-- Probability distributions -->
+<DEFINITION>
+	<FOR>PresentLightOutputsLight</FOR><!--PresentLightOutputsLight | PresentPowerInputsLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>PresentPowerInputsLight</GIVEN>
+	<TABLE>1 0 0 1 0 0 0 0 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerInputsLight</FOR><!--PresentPowerInputsLight | PresentPowerOutputsSwitch,healthWire,-->
+	<GIVEN>healthWire</GIVEN>
+	<GIVEN>PresentPowerOutputsSwitch</GIVEN>
+	<TABLE>1 0 0 0 0 0 0 0 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthLight</FOR><!--healthLight | -->
+	<TABLE>0.9 0.1 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerOutputsSwitch</FOR><!--PresentPowerOutputsSwitch | healthSwitch,PresentPowerInputsSwitch,EnabledStateInputsSwitch,-->
+	<GIVEN>healthSwitch</GIVEN>
+	<GIVEN>EnabledStateInputsSwitch</GIVEN>
+	<GIVEN>PresentPowerInputsSwitch</GIVEN>
+	<TABLE>1 0 0 1 0 1 0 1 0 0 0 0 0 0 0 0 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerInputsSwitch</FOR><!--PresentPowerInputsSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>EnabledStateInputsSwitch</FOR><!--EnabledStateInputsSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthSwitch</FOR><!--healthSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthWire</FOR><!--healthWire | -->
+	<TABLE>0.9 0.1 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>UtilityReplaceLight</FOR><!--UtilityReplaceLight | DecisionReplaceLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>DecisionReplaceLight</GIVEN>
+	<TABLE>5 0 2 4 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>UtilityReplaceSwitch</FOR><!--UtilityReplaceSwitch | healthSwitch,DecisionReplaceSwitch,-->
+	<GIVEN>healthSwitch</GIVEN>
+	<GIVEN>DecisionReplaceSwitch</GIVEN>
+	<TABLE>5 0 2 4 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>UtilityTestObserveHealthLight</FOR><!--UtilityTestObserveHealthLight | DecisionTestObserveHealthLight,-->
+	<GIVEN>DecisionTestObserveHealthLight</GIVEN>
+	<TABLE>0 0 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>TestOutcomeTestObserveHealthLight</FOR><!--TestOutcomeTestObserveHealthLight | DecisionTestObserveHealthLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>DecisionTestObserveHealthLight</GIVEN>
+	<TABLE>0 0 0 0 0 0 0 0 0 0 0 0 </TABLE>
+</DEFINITION>
+
+</NETWORK>
+</BIF>
