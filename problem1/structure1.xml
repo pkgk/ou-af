@@ -168,7 +168,7 @@
 	<FOR>TestOutcomeTestObserveHealthLight</FOR><!--TestOutcomeTestObserveHealthLight | DecisionTestObserveHealthLight,healthLight,-->
 	<GIVEN>healthLight</GIVEN>
 	<GIVEN>DecisionTestObserveHealthLight</GIVEN>
-	<TABLE>0 0 0 0 0 0 0 0 0 0 0 0 </TABLE>
+	<TABLE>0 0 0 0 0 1 0 0 1 0 0 0 </TABLE>
 </DEFINITION>
 
 </NETWORK>
