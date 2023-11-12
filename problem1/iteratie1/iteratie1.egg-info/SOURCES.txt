@@ -1,0 +1,15 @@
+setup.py
+iteratie1.egg-info/PKG-INFO
+iteratie1.egg-info/SOURCES.txt
+iteratie1.egg-info/dependency_links.txt
+iteratie1.egg-info/top_level.txt
+specs/__init__.py
+specs/assemblies.py
+specs/components.py
+specs/connections.py
+specs/tests.py
+src/__init__.py
+src/system.py
+tests/test_diagnosis.py
+tests/test_other.py
+tests/test_proef.py
