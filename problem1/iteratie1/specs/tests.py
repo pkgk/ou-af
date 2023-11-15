@@ -3,7 +3,7 @@ testObserveHealth = {
         "typeUndertest":"Light",
         "decisionvalues":["yes", "no"],
         "testoutcomevalues":["ok","broken", "notdone"],
-        "testoutcomeToReplaceDecision": True,
+        "testoutcomeToReplaceDecision": False,
         "testcosts": -2,
         "testoutcomecpt":{
             'health':                           ["ok"       , "ok"      , "broken" , "broken"],
