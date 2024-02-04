@@ -68,12 +68,20 @@ def setProbabilitiesComponents(diagram, system):
 
         # CPT has type Potential and contains tuples (Instantiations) of discrete variables
         # loop in CPT, transform tuple to dict
-        # if tuple is in normal behavior table: set P(1), else 0
+        # if dict is in normal behavior table: set P(0.9999), else 0.0001, not 0 to prevent problems during inference
+        # lookup is via DeepDiff, example:
+        # s = {'PresentPowerInputsLight': 'yes', 'PresentLightOutputsLight': 'yes', 'healthLight': 'ok'}
+        # t1 = {'PresentLightOutputsLight': 'no', 'PresentPowerInputsLight': 'yes', 'healthLight': 'ok'}
+        # DeepDiff(s, t1)
+        # result {'values_changed': {"root['PresentLightOutputsLight']": {'new_value': 'no', 'old_value': 'yes'}}}     
         for tupleVars in diagram.cpt(diagram.idFromName(output)).loopIn():
             t1 = tupleVars.todict()
             for k, s in component.getCptOutput().items():
                 if ('values_changed' not in DeepDiff(s, t1).keys()):
-                    diagram.cpt(diagram.idFromName(output)).set(tupleVars, 1)        
+                    diagram.cpt(diagram.idFromName(output)).set(tupleVars, 0.9999)
+                    break   # necessary to prevent overwrite of 0.9999 with 0.0001 later-on     
+                else:
+                    diagram.cpt(diagram.idFromName(output)).set(tupleVars, 0.0001)        
 
 
 
@@ -94,7 +102,10 @@ def setProbabilitiesConnections(diagram, system):
             t1 = tupleVars.todict()
             for k, s in normalbehaviortable.items():
                 if ('values_changed' not in DeepDiff(s, t1).keys()):
-                    diagram.cpt(diagram.idFromName(endnode)).set(tupleVars, 1)  
+                    diagram.cpt(diagram.idFromName(endnode)).set(tupleVars, 0.9999)  
+                    break
+                else:
+                    diagram.cpt(diagram.idFromName(endnode)).set(tupleVars, 0.0001)
 
         # set cpt for health
         did = diagram.idFromName(connection.getHealthVariable().name())
@@ -207,9 +218,11 @@ def addTestCPTs(diagram, testoutcomeid, testobject):
 #            print("specs normaal tabel entry: " + str(s))
 #            print("deepdiff voor voorgaande: " + str(DeepDiff(s, t1)))
             if ('values_changed' not in DeepDiff(s, t1).keys()):
-                diagram.cpt(testoutcomeid).set(tupleVars, 1)
+                diagram.cpt(testoutcomeid).set(tupleVars, 0.9999)
 #                print("for tuple: " + str(t1) + " set value to: 1")
                 break
+            else:
+                diagram.cpt(testoutcomeid).set(tupleVars, 0.0001)
 
     
 

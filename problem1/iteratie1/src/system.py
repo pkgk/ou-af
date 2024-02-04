@@ -273,10 +273,13 @@ def getComponents(assembly):
 # loop connections in structure, find specs and start/end components,  create connection object
 def getConnections(assembly, componentslist):
     connectionObjects = []
-    for k, conn in assembly["structure"]["connections"].items():
-        specs = getTypeSpecs(assembly["connections"], conn["type"])
-        startendnames = determineConnectionStartEndNodes(conn, componentslist, specs)
-        connectionObjects.append(Connection(conn["name"], specs,startendnames[0],startendnames[1]))
+    try:
+        for k, conn in assembly["structure"]["connections"].items():
+            specs = getTypeSpecs(assembly["connections"], conn["type"])
+            startendnames = determineConnectionStartEndNodes(conn, componentslist, specs)
+            connectionObjects.append(Connection(conn["name"], specs,startendnames[0],startendnames[1]))
+    except KeyError:
+        print("KeyError, no connections found")
     return connectionObjects
 
 
@@ -301,7 +304,7 @@ def createSystemFromSpecs(assembly):
     print("number of components: " + str(len(componentslist)))
 
     connectionslist = getConnections(assembly, componentslist)
-    print("number of connections: " + str(len(componentslist)))
+    print("number of connections: " + str(len(connectionslist)))
 
     testslist = getTests(assembly, componentslist)
     print("number of tests: " + str(len(testslist)))

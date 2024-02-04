@@ -60,7 +60,7 @@ light = {
             "modality":"Power",
             "property":"Present",
             "propertyvalues":["yes", "no"],
-            "priorprobability":[0.9,0.1]
+            "priorprobability":[0.99,0.01]
         }
     },
     "Outputs":{
@@ -75,7 +75,7 @@ light = {
             "modality":"Health",
             "property":"health",
             "propertyvalues":["ok","broken"],
-            "priorprobability":[0.9,0.1]
+            "priorprobability":[0.99,0.01]
         }
     },
     "Decisions":{
@@ -89,9 +89,9 @@ light = {
     },
     "Behavior":{
         "normal": {
-            'PresentPowerInputs':  ["yes", "no"], 
-            'PresentLightOutputs': ["yes", "no"],
-            'health':              ["ok",  "ok"]
+            'PresentPowerInputs':  ["yes", "no", "yes",    "no"], 
+            'PresentLightOutputs': ["yes", "no", "no",    "yes"],
+            'health':              ["ok",  "ok", "broken", "broken"]
         }
     }
 

@@ -4,11 +4,11 @@ testObserveHealth = {
         "decisionvalues":["yes", "no"],
         "testoutcomevalues":["ok","broken", "notdone"],
         "testoutcomeToReplaceDecision": False,
-        "testcosts": -2,
+        "testcosts": -1,
         "testoutcomecpt":{
             'health':                           ["ok"       , "ok"      , "broken" , "broken"],
             'DecisionTestObserveHealth':        ["yes"      , "no"      , "yes"    , "no"],
-            "TestOutcomeTestObserveHealth":     ["ok"       , "notdone" , "broken" , "notdone"]
+            "TestOutcomeTestObserveHealth":     ["notdone"  , "notdone" , "notdone" , "notdone"]
         }
     }
 

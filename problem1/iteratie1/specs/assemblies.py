@@ -1,4 +1,16 @@
 # small structure
+structure0 = {
+    "name":"structure1",
+    "components": {
+        "1":{
+            "name":"Light",
+            "type":"Light"
+        }
+    }
+}
+
+
+
 structure1 = {
     "name":"structure1",
     "components": {
