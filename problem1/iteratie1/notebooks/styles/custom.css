@@ -1,6 +1,8 @@
 /* https://skelouse.github.io/styling_a_jupyter_notebook */
 
-<style>
+.container { 
+    width:90% !important; 
+}
 
 .blockquote {
   border: 1.5px solid #333;
@@ -20,4 +22,3 @@
 .mycomment {
     color: red;
 }
-</style>

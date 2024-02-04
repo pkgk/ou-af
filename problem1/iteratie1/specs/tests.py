@@ -7,8 +7,8 @@ testObserveHealth = {
         "testcosts": -1,
         "testoutcomecpt":{
             'health':                           ["ok"       , "ok"      , "broken" , "broken"],
-            'DecisionTestObserveHealth':        ["yes"      , "no"      , "yes"    , "no"],
-            "TestOutcomeTestObserveHealth":     ["notdone"  , "notdone" , "notdone" , "notdone"]
+            'DecisionTestObserveHealth':        ["no"      , "yes"      , "no"    , "yes"],
+            "TestOutcomeTestObserveHealth":     ["notdone"  , "ok" , "notdone" , "broken"]
         }
     }
 
