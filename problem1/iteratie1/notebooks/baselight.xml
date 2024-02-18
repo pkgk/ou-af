@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+
+<BIF VERSION="0.3">
+<NETWORK>
+
+<!-- Variables -->
+<VARIABLE TYPE="nature">
+	<NAME>PresentLightOutputsLight</NAME>
+	<PROPERTY>PresentLightOutputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerInputsLight</NAME>
+	<PROPERTY>PresentPowerInputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthLight</NAME>
+	<PROPERTY>healthLight</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="decision">
+	<NAME>DecisionReplaceLight</NAME>
+	<PROPERTY>DecisionReplaceLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="utility">
+	<NAME>UtilityReplaceLight</NAME>
+	<PROPERTY>UtilityReplaceLight</PROPERTY>
+	<OUTCOME>0</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="decision">
+	<NAME>DecisionTestObserveHealthLight</NAME>
+	<PROPERTY>DecisionTestObserveHealthLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="utility">
+	<NAME>UtilityTestObserveHealthLight</NAME>
+	<PROPERTY>UtilityTestObserveHealthLight</PROPERTY>
+	<OUTCOME>0</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>TestOutcomeTestObserveHealthLight</NAME>
+	<PROPERTY>TestOutcomeTestObserveHealthLight</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+	<OUTCOME>notdone</OUTCOME>
+</VARIABLE>
+
+<!-- Probability distributions -->
+<DEFINITION>
+	<FOR>PresentLightOutputsLight</FOR><!--PresentLightOutputsLight | PresentPowerInputsLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>PresentPowerInputsLight</GIVEN>
+	<TABLE>0.9999 0.0001 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerInputsLight</FOR><!--PresentPowerInputsLight | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthLight</FOR><!--healthLight | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>UtilityReplaceLight</FOR><!--UtilityReplaceLight | DecisionReplaceLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>DecisionReplaceLight</GIVEN>
+	<TABLE>-5 0 -2 -4 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>UtilityTestObserveHealthLight</FOR><!--UtilityTestObserveHealthLight | DecisionTestObserveHealthLight,-->
+	<GIVEN>DecisionTestObserveHealthLight</GIVEN>
+	<TABLE>-1 0 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>TestOutcomeTestObserveHealthLight</FOR><!--TestOutcomeTestObserveHealthLight | DecisionTestObserveHealthLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>DecisionTestObserveHealthLight</GIVEN>
+	<TABLE>0.9999 0.0001 0.0001 0.0001 0.0001 0.9999 0.0001 0.9999 0.0001 0.0001 0.0001 0.9999 </TABLE>
+</DEFINITION>
+
+</NETWORK>
+</BIF>

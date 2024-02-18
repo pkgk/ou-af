@@ -19,6 +19,18 @@ testmapping1 = {
     }
 }
 
+testmapping2 = {
+    "1":{
+        "test":"TestObserveHealth",
+        "target":"Light"
+    },
+    "2":{
+        "test":"TestObserveHealth",
+        "target":"Switch"
+    }
+}
+
+
 
 testmapping3 = {
     "1":{
@@ -33,4 +45,8 @@ testmapping3 = {
         "test":"TestObserveHealth",
         "target":"Light2"
     }
+}
+
+testmapping4 = {
+    
 }

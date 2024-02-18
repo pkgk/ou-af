@@ -42,10 +42,10 @@ switch = {
     # normal behavior definition, example: all inputs:"yes" + output: "yes" + health:"ok" is a normal state (specified in "columns" below)
     "Behavior":{
         "normal": {
-            'PresentPowerInputs':  ["yes", "yes","no" , "no"], 
-            'EnabledStateInputs':  ["yes", "no" ,"yes", "no"],
-            'PresentPowerOutputs': ["yes", "no" ,"no" , "no"],
-            'health':              ["ok",  "ok" , "ok", "ok"]
+            'PresentPowerInputs':  ["yes", "yes","no" , "no", "yes",    "no",     "yes",    "no"], 
+            'EnabledStateInputs':  ["yes", "no" ,"yes", "no", "yes",    "yes",    "no",     "no"],
+            'PresentPowerOutputs': ["yes", "no" ,"no" , "no", "no",     "no",     "no",     "no"],
+            'health':              ["ok",  "ok" , "ok", "ok", "broken", "broken", "broken", "broken"]
         }
     }
 }
@@ -90,7 +90,7 @@ light = {
     "Behavior":{
         "normal": {
             'PresentPowerInputs':  ["yes", "no", "yes",    "no"], 
-            'PresentLightOutputs': ["yes", "no", "no",    "yes"],
+            'PresentLightOutputs': ["yes", "no", "no",    "no"],
             'health':              ["ok",  "ok", "broken", "broken"]
         }
     }
