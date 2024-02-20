@@ -48,5 +48,21 @@ testmapping3 = {
 }
 
 testmapping4 = {
-    
+
 }
+
+
+testmappinglight = {
+    "1":{
+        "test":"TestObserveHealth",
+        "target":"Light"
+    }
+}
+
+testmappingswitch = {
+    "1":{
+        "test":"TestObserveHealth",
+        "target":"Switch"
+    }
+}
+

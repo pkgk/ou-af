@@ -96,3 +96,13 @@ structure3 = {
 
     }
 }
+ 
+structure4 = {
+    "name":"structure1",
+    "components": {
+        "1":{
+            "name":"Switch",
+            "type":"Switch"
+        }
+    }
+}
