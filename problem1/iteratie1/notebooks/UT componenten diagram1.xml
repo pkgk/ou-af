@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+
+<BIF VERSION="0.3">
+<NETWORK>
+
+<!-- Variables -->
+<VARIABLE TYPE="nature">
+	<NAME>PresentLightOutputsLight</NAME>
+	<PROPERTY>PresentLightOutputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerInputsLight</NAME>
+	<PROPERTY>PresentPowerInputsLight</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthLight</NAME>
+	<PROPERTY>healthLight</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerOutputsSwitch</NAME>
+	<PROPERTY>PresentPowerOutputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>PresentPowerInputsSwitch</NAME>
+	<PROPERTY>PresentPowerInputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>EnabledStateInputsSwitch</NAME>
+	<PROPERTY>EnabledStateInputsSwitch</PROPERTY>
+	<OUTCOME>yes</OUTCOME>
+	<OUTCOME>no</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthSwitch</NAME>
+	<PROPERTY>healthSwitch</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<VARIABLE TYPE="nature">
+	<NAME>healthWire</NAME>
+	<PROPERTY>healthWire</PROPERTY>
+	<OUTCOME>ok</OUTCOME>
+	<OUTCOME>broken</OUTCOME>
+</VARIABLE>
+
+<!-- Probability distributions -->
+<DEFINITION>
+	<FOR>PresentLightOutputsLight</FOR><!--PresentLightOutputsLight | PresentPowerInputsLight,healthLight,-->
+	<GIVEN>healthLight</GIVEN>
+	<GIVEN>PresentPowerInputsLight</GIVEN>
+	<TABLE>0.9999 0.0001 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerInputsLight</FOR><!--PresentPowerInputsLight | PresentPowerOutputsSwitch,healthWire,-->
+	<GIVEN>healthWire</GIVEN>
+	<GIVEN>PresentPowerOutputsSwitch</GIVEN>
+	<TABLE>0.9999 0.0001 0.0001 0.9999 0.0001 0.9999 0.9999 0.0001 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthLight</FOR><!--healthLight | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerOutputsSwitch</FOR><!--PresentPowerOutputsSwitch | healthSwitch,PresentPowerInputsSwitch,EnabledStateInputsSwitch,-->
+	<GIVEN>healthSwitch</GIVEN>
+	<GIVEN>EnabledStateInputsSwitch</GIVEN>
+	<GIVEN>PresentPowerInputsSwitch</GIVEN>
+	<TABLE>0.9999 0.0001 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 0.0001 0.9999 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>PresentPowerInputsSwitch</FOR><!--PresentPowerInputsSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>EnabledStateInputsSwitch</FOR><!--EnabledStateInputsSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthSwitch</FOR><!--healthSwitch | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+<DEFINITION>
+	<FOR>healthWire</FOR><!--healthWire | -->
+	<TABLE>0.99 0.01 </TABLE>
+</DEFINITION>
+
+</NETWORK>
+</BIF>
