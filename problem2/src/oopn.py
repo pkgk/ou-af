@@ -16,7 +16,7 @@ class Component:
         self.replacedecision = {}                              # dict specifying nodes necessary to model replace decision
         self.setVariables()                           
         self.setInternalConnections()
-#        self.setCptOutput()
+        self.setCptOutput()
         self.setReplaceDecision()
 
     # create pyAgrum Labelized variables per node in the component
@@ -48,11 +48,22 @@ class Component:
     # read the normal behavior table, store in format that can be used later
     # private method
     def setCptOutput(self):
-            dfstates = pd.DataFrame.from_dict(data = self.specs['Behavior']['normal'])
-            dfstates.rename(columns=lambda x: x + self.name, inplace=True)
-            # transform dataframe back to dict but in different format for comparison
-            self.cptoutput = dfstates.to_dict('index')
-            
+        cptDict = {}
+        for k, v in self.specs['Behavior']['normal'].items():
+            var = k + self.getName()
+            count = 0
+            for e in v:
+                if count in cptDict:
+                    d = cptDict[count]
+                    d[var] = e
+                else:
+                    cptDict[count] = {var: e}
+                count = count + 1
+        self.cptoutput = cptDict
+
+
+
+
     # create dict with specification of a replace decision
     # private method
     def setReplaceDecision(self):
