@@ -1,0 +1,24 @@
+/* https://skelouse.github.io/styling_a_jupyter_notebook */
+
+.container { 
+    width:90% !important; 
+}
+
+.blockquote {
+  border: 1.5px solid #333;
+  padding: 8px 12px;
+  background-image: linear-gradient(180deg, #fff, rgb(160, 147, 147));
+  position: static;
+}
+
+.img {
+    display: inline-block;
+    align: left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+}
+
+.mycomment {
+    color: red;
+}
