@@ -1,6 +1,6 @@
 import pytest
 import pyAgrum
-from problem2.src.oopn import Component, Connection, Assembly, ObserveTest
+from problem2.src.oopnclasses import Component, Connection, Assembly, ObserveTest
 from problem2.specs.components import light, switch
 
 
@@ -17,8 +17,9 @@ def test_CreateComponent():
         assert component.getComponentNodeNames() == ['PresentPowerOutputsswitch', 'PresentPowerInputsswitch', 'EnabledStateInputsswitch', 'healthswitch']
         assert type(component.getVariables()[0]) == pyAgrum.LabelizedVariable
         assert type(component.getInternalConnections()[0]) == tuple
-        assert type(component.getCptOutput()) == dict
-        assert component.getCptOutput()[0] == cpttable
+        assert type(component.getCptOutput()) == pyAgrum.Potential
+        for t in component.getCptOutput().loopIn():
+             assert type(t) == pyAgrum.Instantiation
         assert component.getHealthVarName() == "healthswitch"
         assert component.getHealthPrior() == [0.99,0.01]
         assert component.getOutputsVarName() == "PresentPowerOutputsswitch"
@@ -27,3 +28,4 @@ def test_CreateComponent():
 
 
 
+     

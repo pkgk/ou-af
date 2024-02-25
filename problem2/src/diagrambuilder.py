@@ -66,7 +66,7 @@ def setProbabilitiesComponents(diagram, system):
             if(hasParent(diagram, diagram.idFromName(inputnode)) == False):
                 diagram.cpt(diagram.idFromName(inputnode)).fillWith(component.getInputPrior(inputnode))
 
-        # CPT has type Potential and contains tuples (Instantiations) of discrete variables
+        # CPT has type Potential and contains tuples (Instantiations) of discrete variables as index
         # loop in CPT, transform tuple to dict
         # if dict is in normal behavior table: set P(0.9999), else 0.0001, not 0 to prevent problems during inference
         # lookup is via DeepDiff, example:
@@ -275,17 +275,17 @@ def diagramBuilder(diagram, system):
     addBNNodesToDiagram(diagram, system)
 
     # add connections
-    addComponentConnectionsToDiagram(diagram, system)
+#    addComponentConnectionsToDiagram(diagram, system)
 
     # set prior probabilities for components and connections
-    setProbabilitiesComponents(diagram, system)
-    setProbabilitiesConnections(diagram, system)
+#    setProbabilitiesComponents(diagram, system)
+#    setProbabilitiesConnections(diagram, system)
 
     # add a "replace" decision per component + fill utility
-    addReplaceDecisions(diagram, system)
-    fillReplaceDecisionUtilities(diagram, system)
+#    addReplaceDecisions(diagram, system)
+#    fillReplaceDecisionUtilities(diagram, system)
 
     # add tests 
-    addTests(diagram, system)
+#    addTests(diagram, system)
 
     return diagram

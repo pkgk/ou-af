@@ -98,7 +98,7 @@ structure3 = {
 }
  
 structure4 = {
-    "name":"structure1",
+    "name":"structure4",
     "components": {
         "1":{
             "name":"Switch",

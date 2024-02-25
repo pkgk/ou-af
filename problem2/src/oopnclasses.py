@@ -1,6 +1,6 @@
 import pyAgrum as gum
 import re
-#import pandas as pd
+from deepdiff import DeepDiff
 
 
 # this class models a component in the system
@@ -12,12 +12,10 @@ class Component:
         self.specs = specs                                     # dict specifying component
         self.variables = []                                    # Labelized variables used to generate nodes in diagram
         self.internalconnections = []                          # arcs between inputs > output + healt > output
-        self.cptoutput = {}                                    # specification of cpt for outputnode
-        self.replacedecision = {}                              # dict specifying nodes necessary to model replace decision
+        self.cptoutput = gum.Potential()                       # specification of cpt for outputnode
         self.setVariables()                           
         self.setInternalConnections()
         self.setCptOutput()
-        self.setReplaceDecision()
 
     # create pyAgrum Labelized variables per node in the component
     # private method
@@ -45,9 +43,10 @@ class Component:
             elif(re.search("health", variable.name())):
                 self.internalconnections.append((variable.name(), outputname))
     
-    # read the normal behavior table, store in format that can be used later
-    # private method
-    def setCptOutput(self):
+
+    # transforms the readable behavior table from specs to a format for use
+    # during creation of a potential
+    def transformBehaviorTable(self):
         cptDict = {}
         for k, v in self.specs['Behavior']['normal'].items():
             var = k + self.getName()
@@ -59,24 +58,46 @@ class Component:
                 else:
                     cptDict[count] = {var: e}
                 count = count + 1
-        self.cptoutput = cptDict
+        return cptDict
 
 
-
-
-    # create dict with specification of a replace decision
+    # read the normal behavior table, transform to potential 
     # private method
-    def setReplaceDecision(self):
-        for k, decision in self.specs["Decisions"].items():
-            if (re.search("Replace", decision["name"])):
-                decisionvarname = "Decision" + decision["name"] + self.name
-                utilityvarname = "Utility" + decision["name"] + self.name
-                self.replacedecision["decision"] = gum.LabelizedVariable(decisionvarname, decisionvarname, decision['values'])
-                self.replacedecision["utility"] = gum.LabelizedVariable(utilityvarname, utilityvarname, 1)
-                self.replacedecision["arcs"] = [(decisionvarname, utilityvarname),(self.getHealthVarName(), utilityvarname)]
-                self.replacedecision["replacementcosts"] = decision["replacementcosts"]
-                self.replacedecision["incorrectreplacementcosts"] = decision["incorrectreplacementcosts"]
-                self.replacedecision["failuretorepaircosts"] = decision["failuretorepaircosts"]
+    def setCptOutput(self):
+        # first create the potential with all the probabilities
+        # P(X | Y, Z) X should be first variable when creating potential
+        x = None
+        yz = []
+
+        # number of labels for X is relevant for determinining probability later on
+        xnumberoflabels = None
+
+        for l in self.getVariables():
+            if "Output" in l.name():
+                x = l
+                xnumberoflabels = len(l.labels())
+            else:
+                yz.append(l)
+
+        p = gum.Potential().add(x)
+        for y in yz:
+            p.add(y)
+
+        # second fill potential based on values from behavior table 
+        behavior = self.transformBehaviorTable()
+
+        for potentialindex in p.loopIn():
+            pid = potentialindex.todict()
+            for k, v in behavior.items():
+                if ('values_changed' not in DeepDiff(pid, v).keys()):
+                    prob = 1 - ((xnumberoflabels - 1) * 0.01)
+                    p.set(potentialindex, prob)
+                    break
+                else:
+                    p.set(potentialindex, 0.01)
+
+        self.cptoutput = p
+
 
 
 # get methods
@@ -129,8 +150,6 @@ class Component:
             varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
             if (varname == inputitem):
                 return v["priorprobability"]
-    def getReplaceDecision(self):
-        return self.replacedecision
     
 
 
@@ -148,7 +167,8 @@ class Connection:
         self.specs = specs                                   # dict specifying properties of connection
         self.startnode = startnode                           # name of variable starting point for connection
         self.endnode = endnode                               # name of variable ending point for connection
-        self.cptendcomponent = self.setCptEndComponent()     # storing normal behavior table
+        self.cptendcomponent = None
+        self.setCptEndComponent()                            # potentional for cpt
         
     # create pyAgrum labelized variable used when adding health for connection to diagram
     def getHealthVariable(self):
@@ -163,12 +183,26 @@ class Connection:
         elif (re.search(name, self.endnode)): return self.endnode
         elif (re.search("health", name)): return name + self.name
         
-    # prepare normal behavior table for later use determining cpt of endcomponent
+    # determine cpt for connection
+    # connection consists of startnode, endnode and healthnode
+    # endnode is a input node, startnode is a outputnode
     def setCptEndComponent(self):
-        dfstates = pd.DataFrame.from_dict(data = self.specs['Behavior']['normal'])
-        dfstates.rename(columns=lambda x: self.addComponentName(x), inplace=True)
-        # transform dataframe back to dict but in different format for comparison
-        return dfstates.to_dict('index')
+        # transform behavior table
+        cptDict = {}
+        for k, v in self.specs['Behavior']['normal'].items():
+            var = k + self.addComponentName(k)
+            count = 0
+            for e in v:
+                if count in cptDict:
+                    d = cptDict[count]
+                    d[var] = e
+                else:
+                    cptDict[count] = {var: e}
+                count = count + 1
+        return cptDict
+
+
+        
 
     # get methods
     def getStartNode(self):
@@ -210,9 +244,18 @@ class ObserveTest:
     def addComponentName(self, x):
         return x + self.target
     def setCptTestOutcomeNode(self):
-        dfstates = pd.DataFrame.from_dict(data = self.specs["testoutcomecpt"])
-        dfstates.rename(columns=lambda x: self.addComponentName(x), inplace=True)
-        self.testoutcomecpt =  dfstates.to_dict("index")
+        cptDict = {}
+        for k, v in self.specs['testoutcomecpt'].items():
+            var = k + self.addComponentName(k)
+            count = 0
+            for e in v:
+                if count in cptDict:
+                    d = cptDict[count]
+                    d[var] = e
+                else:
+                    cptDict[count] = {var: e}
+                count = count + 1
+        self.testoutcomecpt = cptDict
     def getTestOutcomeCpt(self):
         return self.testoutcomecpt     
     def getName(self):
@@ -241,6 +284,8 @@ class Assembly:
         self.components = components
         self.connections = connections
         self.tests = tests
+    def getName(self):
+        return self.name
     def getComponents(self):
         return self.components
     def getConnections(self):
@@ -248,94 +293,3 @@ class Assembly:
     def getTests(self):
         return self.tests
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# helper to find a specification that matches a given type
-def getTypeSpecs(specs, ctype):
-    for c in specs:
-        if (c["type"] == ctype):
-            return c
-
-# helper to find a specific component by name in list of components
-def findComponent(requestedcomponent, componentlist):
-    for component in componentlist:
-        if (component.getName() == requestedcomponent):
-            return component
-
-# helper to determine start / end nodes based on list of existing components and connection specs
-def determineConnectionStartEndNodes(connection, componentslist, specs):
-    # determine startComponent: variablename
-    startcomponentobject = findComponent(connection["startComponent"], componentslist)
-    endcomponentobject = findComponent(connection["endComponent"], componentslist)
-    for label in startcomponentobject.getVariables():
-        if(re.search(specs["start"], label.name())):
-            startname = label.name()
-    for label in endcomponentobject.getVariables():
-        if(re.search(specs["end"], label.name())):
-            endname = label.name()
-    return (startname, endname)
-
-    
-# create components objects
-# loop structure, find specs, create component object
-def getComponents(assembly):
-    componentObjects = []
-    for k, component in assembly["structure"]["components"].items():
-        specs = getTypeSpecs(assembly["components"], component['type'])
-        componentObjects.append(Component(component["name"], specs))
-    return componentObjects
-    
-
-# create connections objects
-# loop connections in structure, find specs and start/end components,  create connection object
-def getConnections(assembly, componentslist):
-    connectionObjects = []
-    try:
-        for k, conn in assembly["structure"]["connections"].items():
-            specs = getTypeSpecs(assembly["connections"], conn["type"])
-            startendnames = determineConnectionStartEndNodes(conn, componentslist, specs)
-            connectionObjects.append(Connection(conn["name"], specs,startendnames[0],startendnames[1]))
-    except KeyError:
-        print("KeyError, no connections found")
-    return connectionObjects
-
-
-# create Test objects
-# loop the testmapping specification, find test specs + targetnode, create testobject
-def getTests(assembly, componentslist):
-    testObjects = []
-    for k, test in assembly['testmapping'].items():
-        for testtype in assembly["tests"]:
-            if (test["test"] == testtype["name"]):
-                specs = testtype
-                testObjects.append(Test(testtype['name'], test["target"], specs))
-    return testObjects
-        
-    
-# MAIN method to build objects and create a system definition
-def createSystemFromSpecs(assembly):
-    name = assembly['structure']["name"]
-    print("building system: " + name)
-
-    componentslist = getComponents(assembly)
-    print("number of components: " + str(len(componentslist)))
-
-    connectionslist = getConnections(assembly, componentslist)
-    print("number of connections: " + str(len(connectionslist)))
-
-    testslist = getTests(assembly, componentslist)
-    print("number of tests: " + str(len(testslist)))
-    
-    return Assembly(name, componentslist, connectionslist, testslist)
