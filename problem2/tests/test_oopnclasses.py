@@ -1,31 +1,43 @@
 import pytest
 import pyAgrum
-from problem2.src.oopnclasses import Component, Connection, Assembly, ObserveTest
+from problem2.src.oopnclasses import Component, Connection, Assembly, ObserveTest, Node
 from problem2.specs.components import light, switch
 
 
 ### 
 def test_CreateComponent():
 
-        cpttable = {    'PresentPowerInputsswitch': 'yes',
+     cpttable = {    'PresentPowerInputsswitch': 'yes',
                         'EnabledStateInputsswitch': 'yes',
                         'PresentPowerOutputsswitch': 'yes',
                         'healthswitch': 'ok'}
         
-        component = Component("switch", switch)
-        assert component.getName() == "switch"
-        assert component.getComponentNodeNames() == ['PresentPowerOutputsswitch', 'PresentPowerInputsswitch', 'EnabledStateInputsswitch', 'healthswitch']
-        assert type(component.getVariables()[0]) == pyAgrum.LabelizedVariable
-        assert type(component.getInternalConnections()[0]) == tuple
-        assert type(component.getCptOutput()) == pyAgrum.Potential
-        for t in component.getCptOutput().loopIn():
-             assert type(t) == pyAgrum.Instantiation
-        assert component.getHealthVarName() == "healthswitch"
-        assert component.getHealthPrior() == [0.99,0.01]
-        assert component.getOutputsVarName() == "PresentPowerOutputsswitch"
-        assert component.getInputsVarNames() == ['PresentPowerInputsswitch', 'EnabledStateInputsswitch']
-        assert component.getInputPrior('PresentPowerInputsswitch') == [0.99,0.01]
+     component = Component("switch", switch)
+     assert component.getName() == "switch"
+
+     assert component.getComponentNodeNames() == ['PresentPowerOutputsswitch', 'PresentPowerInputsswitch', 'EnabledStateInputsswitch', 'healthswitch']
+     assert len(component.getNodes()) == 4
+     assert type(component.getNodes()[0]) == Node
+     assert type(component.getNodes()[0].getVariable()) == pyAgrum.LabelizedVariable
+     assert type(component.getNodeVariables()[0]) == pyAgrum.LabelizedVariable
+     assert type(component.getInternalConnections()[0]) == tuple
+
+     assert component.getHealthVarName() == "healthswitch"
+     assert component.getOutputsVarName() == "PresentPowerOutputsswitch"
+     assert component.getInputsVarNames() == ['PresentPowerInputsswitch', 'EnabledStateInputsswitch']
+
+     for c in component.getNodes():
+          if (c.getType() == "Output"):
+               assert type(c.getPrior() == pyAgrum.Potential)
+               for p in c.getPrior().loopIn():
+                    assert type(p) == pyAgrum.Instantiation
+     assert type(component.getHealthNode().getVariable() == pyAgrum.LabelizedVariable)
+     assert type(component.getHealthPrior() == pyAgrum.Potential) 
+     for node in component.getInputNodes():
+          type(node.getPrior()) == pyAgrum.Potential         
 
 
 
+
+     
      

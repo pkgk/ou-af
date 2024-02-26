@@ -3,6 +3,32 @@ import re
 from deepdiff import DeepDiff
 
 
+
+class Node:
+    def __init__(self, name, nodetype, variable):
+        self.name = name
+        self.type = nodetype
+        self.variable = variable                      # pyAgrum LabelizedVariable
+        self.prior = None                             # pyAgrum Potential
+
+    def setPrior(self, prior):
+        self.prior = prior
+    
+    def getPrior(self):
+        return self.prior
+
+    def getName(self):
+        return self.name
+    
+    def getType(self):
+        return self.type
+    
+    def getVariable(self):
+        return self.variable
+
+
+
+
 # this class models a component in the system
 # the component is defined by it's name and specs (a dict)
 # from the specs the internal variables are determined
@@ -10,34 +36,42 @@ class Component:
     def __init__(self, name, specs):
         self.name = name                                       # name of the component
         self.specs = specs                                     # dict specifying component
-        self.variables = []                                    # Labelized variables used to generate nodes in diagram
-        self.internalconnections = []                          # arcs between inputs > output + healt > output
-        self.cptoutput = gum.Potential()                       # specification of cpt for outputnode
-        self.setVariables()                           
+        self.nodes = []
+        self.internalconnections = []                          # internal arcs, list of tuples
+        self.createNodes()
         self.setInternalConnections()
-        self.setCptOutput()
+        self.setPriorOutput()
+        self.setPriorHealth()
+        self.setPriorInputs()
 
-    # create pyAgrum Labelized variables per node in the component
-    # private method
-    def setVariables(self):
+
+    def createNodes(self):
+        # create outputnode
         v = self.specs["Outputs"]["1"]
         varname = str( v['property'] + v['modality']+ "Outputs" + self.name)
-        self.variables.append(gum.LabelizedVariable(varname, varname, v['propertyvalues'])) 
+        node = Node(varname, "Output", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+        self.nodes.append(node)
+
+        # create input nodes
         for k, v in self.specs["Inputs"].items():
             varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
-            self.variables.append(gum.LabelizedVariable(varname, varname, v['propertyvalues']))            
+            node = Node(varname, "Input", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+            self.nodes.append(node)
+        # create health node
         v = self.specs["Healths"]["1"]
         varname = str(v["property"] + self.name)
-        self.variables.append(gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+        node = Node(varname, "Health", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+        self.nodes.append(node)
+        
 
     # define the connections that are internal to the component
     # private method
     def setInternalConnections(self):
         # define connections for inputs / health nodes to output within component
-        for variable in self.variables:
+        for variable in self.getNodeVariables():
             if(re.search("Outputs", variable.name())):
                 outputname = variable.name()
-        for variable in self.variables:
+        for variable in self.getNodeVariables():
             if(re.search("Inputs", variable.name())):
                 self.internalconnections.append((variable.name(), outputname))
             elif(re.search("health", variable.name())):
@@ -63,7 +97,7 @@ class Component:
 
     # read the normal behavior table, transform to potential 
     # private method
-    def setCptOutput(self):
+    def setPriorOutput(self):
         # first create the potential with all the probabilities
         # P(X | Y, Z) X should be first variable when creating potential
         x = None
@@ -72,7 +106,7 @@ class Component:
         # number of labels for X is relevant for determinining probability later on
         xnumberoflabels = None
 
-        for l in self.getVariables():
+        for l in self.getNodeVariables():
             if "Output" in l.name():
                 x = l
                 xnumberoflabels = len(l.labels())
@@ -96,55 +130,118 @@ class Component:
                 else:
                     p.set(potentialindex, 0.01)
 
-        self.cptoutput = p
+        # add potential to node
+        for node in self.getNodes():
+            if (node.getType() == "Output"):
+                node.setPrior(p)
 
+
+    # set the prior of the health node
+    # assumption is health has states ok / broken and specs contains [0.99, 0.01]
+    def setPriorHealth(self):
+        # get prior from spec, health has no parents
+        p = self.specs["Healths"]["1"]["priorprobability"]
+        # create potential for cpt
+        priorPotential = gum.Potential()
+        # add the labelized variable
+        priorPotential.add(self.getHealthNode().getVariable())
+        # create instantiation to use as index
+        instantiationindex = gum.Instantiation()
+        instantiationindex.add(self.getHealthNode().getVariable())
+        # set value for health:ok
+        priorPotential.set(instantiationindex, p[0])
+        # change instantiation to broken and set value
+        instantiationindex.chgVal(self.getHealthNode().getVariable(), 1)
+        priorPotential.set(instantiationindex, p[1])
+        # save prior at node
+        self.getHealthNode().setPrior(priorPotential)
+
+
+    def findInputPriorFromSpecs(self, inputname):
+        for k, v in self.specs["Inputs"].items():
+            varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
+            if (varname == inputname):
+                return v["priorprobability"]
+
+
+
+    def setPriorInputs(self):
+        for node in self.getInputNodes():
+            p = self.findInputPriorFromSpecs(node.getName())
+            priorPotential = gum.Potential()
+            priorPotential.add(node.getVariable())
+            instantiationindex = gum.Instantiation()
+            instantiationindex.add(node.getVariable())
+            priorPotential.set(instantiationindex, p[0])
+            # change instantiation to broken and set value
+            instantiationindex.chgVal(node.getVariable(), 1)
+            priorPotential.set(instantiationindex, p[1])
+            # save prior at node
+            node.setPrior(priorPotential)
+
+                                           
 
 
 # get methods
 # public methods                
     def getComponentNodeNames(self):
-        varlist = []
-        for var in self.variables:
-            varlist.append(var.name())
-        return varlist
+        nodenames = []
+        for node in self.nodes:
+            nodenames.append(node.getName())
+        return nodenames
 
     # name of component as string
     def getName(self):
         return self.name
 
     # variables for component as pyAgrum  list of variables
-    def getVariables(self):
-        return self.variables
+    def getNodeVariables(self):
+        nodevariables = []
+        for node in self.nodes:
+            nodevariables.append(node.getVariable())
+        return nodevariables
+    
+    # nodes of component
+    def getNodes(self):
+        return  self.nodes
 
     # get internal connections to component as list of tuples
     def getInternalConnections(self):
         return self.internalconnections
     
-    # get conditional probability table for output node as dict
-    def getCptOutput(self):
-        return self.cptoutput
-    
+    def getHealthNode(self):
+        for node in self.getNodes():
+            if (node.getType() == "Health"):
+                return node
+
     # get name as string
     def getHealthVarName(self):
-        for name in self.getComponentNodeNames():
-            if (re.search("health", name)):
-                return name
+        for node in self.getNodes():
+            if (node.getType() == "Health"):
+                return node.getName()
+    
+    def getOutputsVarName(self):
+        for node in self.getNodes():
+            if (node.getType() == "Output"):
+                return node.getName()
+
+    def getInputNodes(self):
+        nodes = []
+        for node in self.getNodes():
+            if (node.getType() == "Input"):
+                nodes.append(node)
+        return nodes
+
+    def getInputsVarNames(self):
+        nodenames = []
+        for node in self.getInputNodes():
+            nodenames.append(node.getName())
+        return nodenames
 
     # get prior as list of probabilities
     def getHealthPrior(self):
-        v = self.specs["Healths"]["1"]
-        return v["priorprobability"]
-    
-    def getOutputsVarName(self):
-        for name in self.getComponentNodeNames():
-            if (re.search("Outputs", name)):
-                return name
-    def getInputsVarNames(self):
-        nodenames = []
-        for name in self.getComponentNodeNames():
-            if (re.search("Inputs", name)):
-                nodenames.append(name)
-        return nodenames
+        return self.getHealthNode().getPrior()
+
     def getInputPrior(self, inputitem):
         for k, v in self.specs["Inputs"].items():
             varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
