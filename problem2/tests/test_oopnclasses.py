@@ -2,6 +2,7 @@ import pytest
 import pyAgrum
 from problem2.src.oopnclasses import Component, Connection, Assembly, ObserveTest, Node
 from problem2.specs.components import light, switch
+from problem2.specs.connections import wire
 
 
 ### 
@@ -34,10 +35,21 @@ def test_CreateComponent():
      assert type(component.getHealthNode().getVariable() == pyAgrum.LabelizedVariable)
      assert type(component.getHealthPrior() == pyAgrum.Potential) 
      for node in component.getInputNodes():
-          type(node.getPrior()) == pyAgrum.Potential         
+          assert type(node.getPrior()) == pyAgrum.Potential   
+
+
+def test_createConnection():
+
+     component1 = Component("switch", switch)
+     component2 = Component("light", light)
+     connection = Connection("wire", wire, component1, component2)
+     assert type(connection.getEndNode()) == Node
+     assert type(connection.getStartNode()) == Node
+     assert connection.getStartNode().getName() == "PresentPowerOutputsswitch"
+#     assert connection.setCptEndNode() == 2
 
 
 
 
-     
+
      

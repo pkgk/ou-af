@@ -141,20 +141,8 @@ class Component:
     def setPriorHealth(self):
         # get prior from spec, health has no parents
         p = self.specs["Healths"]["1"]["priorprobability"]
-        # create potential for cpt
-        priorPotential = gum.Potential()
-        # add the labelized variable
-        priorPotential.add(self.getHealthNode().getVariable())
-        # create instantiation to use as index
-        instantiationindex = gum.Instantiation()
-        instantiationindex.add(self.getHealthNode().getVariable())
-        # set value for health:ok
-        priorPotential.set(instantiationindex, p[0])
-        # change instantiation to broken and set value
-        instantiationindex.chgVal(self.getHealthNode().getVariable(), 1)
-        priorPotential.set(instantiationindex, p[1])
-        # save prior at node
-        self.getHealthNode().setPrior(priorPotential)
+        hnode = self.getHealthNode()
+        hnode.setPrior(self.generateInstantiationTuples([hnode.getVariable()], p))
 
 
     def findInputPriorFromSpecs(self, inputname):
@@ -168,18 +156,23 @@ class Component:
     def setPriorInputs(self):
         for node in self.getInputNodes():
             p = self.findInputPriorFromSpecs(node.getName())
-            priorPotential = gum.Potential()
-            priorPotential.add(node.getVariable())
-            instantiationindex = gum.Instantiation()
-            instantiationindex.add(node.getVariable())
-            priorPotential.set(instantiationindex, p[0])
-            # change instantiation to broken and set value
-            instantiationindex.chgVal(node.getVariable(), 1)
-            priorPotential.set(instantiationindex, p[1])
-            # save prior at node
-            node.setPrior(priorPotential)
+            node.setPrior(self.generateInstantiationTuples([node.getVariable()], p))
 
                                            
+    def generateInstantiationTuples(self, vars, priors):
+        pot = gum.Potential()
+        i = gum.Instantiation()
+        for v in vars:
+            pot.add(v)
+            i.add(v)
+        for p in priors:
+            pot.set(i, p)
+            if i.end():
+                break
+            else:
+                i.inc()
+        return pot
+
 
 
 # get methods
@@ -220,6 +213,11 @@ class Component:
             if (node.getType() == "Health"):
                 return node.getName()
     
+    def getOutputNode(self):
+        for node in self.getNodes():
+            if (node.getType() == "Output"):
+                return node
+
     def getOutputsVarName(self):
         for node in self.getNodes():
             if (node.getType() == "Output"):
@@ -242,11 +240,11 @@ class Component:
     def getHealthPrior(self):
         return self.getHealthNode().getPrior()
 
+
     def getInputPrior(self, inputitem):
-        for k, v in self.specs["Inputs"].items():
-            varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
-            if (varname == inputitem):
-                return v["priorprobability"]
+        for node in self.getInputNodes():
+            if (node.getName() == "inputitem"):
+                return node.getPrior()
     
 
 
@@ -259,35 +257,69 @@ class Component:
 # a connection is defined by it's name, specs (dict) and start + end components
 
 class Connection:
-    def __init__(self, name, specs, startnode, endnode):
+    def __init__(self, name, specs, startcomponent, endcomponent):
         self.name = name                                     # name of the connection
         self.specs = specs                                   # dict specifying properties of connection
-        self.startnode = startnode                           # name of variable starting point for connection
-        self.endnode = endnode                               # name of variable ending point for connection
+        self.startcomponent = startcomponent
+        self.endcomponent = endcomponent
+        self.startnode = None                                # node that is starting point for connection
+        self.endnode = None                                  # node that is ending point for connection
+        self.healthnode = None
         self.cptendcomponent = None
-        self.setCptEndComponent()                            # potentional for cpt
+        self.setHealthVariable()
+        self.setPriorHealth()
+        self.setStartEndNodes()
+        self.setCptEndNode()                                 # potentional for cpt
+
         
     # create pyAgrum labelized variable used when adding health for connection to diagram
-    def getHealthVariable(self):
+    def setHealthVariable(self):
         label = "health" + self.name
         v = self.specs["Healths"]["1"]
-        propertyvalues = v["propertyvalues"]
-        return gum.LabelizedVariable(label, label, propertyvalues)
+        self.healthnode = Node(label, "Health", gum.LabelizedVariable(label, label, v['propertyvalues']))
+
+    # set the prior of the health node
+    # assumption is health has states ok / broken and specs contains [0.99, 0.01]
+    def setPriorHealth(self):
+        # get prior from spec, health has no parents
+        p = self.specs["Healths"]["1"]["priorprobability"]
+        self.healthnode.setPrior(self.generateInstantiationTuples([self.healthnode.getVariable()], p))
+
+    def generateInstantiationTuples(self, vars, priors):
+        pot = gum.Potential()
+        i = gum.Instantiation()
+        for v in vars:
+            pot.add(v)
+            i.add(v)
+        for p in priors:
+            pot.set(i, p)
+            if i.end():
+                break
+            else:
+                i.inc()
+        return pot
+
+
+
+    def setStartEndNodes(self):
+        startnodename = str(self.specs['start'] + self.startcomponent.getName())
+        for node in self.startcomponent.getNodes():
+            if (node.getName() == startnodename): self.startnode = node
+            break
+
+        endnodename = str(self.specs['end'] + self.endcomponent.getName())
+        for node in self.endcomponent.getNodes():
+            if (node.getName() == endnodename): self.endnode = node
+
     
-    # determine start / end component names
-    def addComponentName(self, name):
-        if (re.search(name, self.startnode)): return self.startnode
-        elif (re.search(name, self.endnode)): return self.endnode
-        elif (re.search("health", name)): return name + self.name
-        
-    # determine cpt for connection
-    # connection consists of startnode, endnode and healthnode
-    # endnode is a input node, startnode is a outputnode
-    def setCptEndComponent(self):
-        # transform behavior table
+
+
+    # transforms the readable behavior table from specs to a format for use
+    # during creation of a potential
+    def transformBehaviorTable(self):
         cptDict = {}
         for k, v in self.specs['Behavior']['normal'].items():
-            var = k + self.addComponentName(k)
+            var = k + self.getName()
             count = 0
             for e in v:
                 if count in cptDict:
@@ -299,20 +331,40 @@ class Connection:
         return cptDict
 
 
+    def setCptEndNode(self):
+        # first extend potential
+        potential = self.endnode.getPrior()
+        labelvar = self.startnode.getVariable()
+        potential.add(labelvar)
         
+        # second fill potential based on values from behavior table 
+        behavior = self.transformBehaviorTable()
+
+        xnumberoflabels = len(self.endnode.getVariable().labels())
+
+        for potentialindex in potential.loopIn():
+            pid = potentialindex.todict()
+            for k, v in behavior.items():
+                if ('values_changed' not in DeepDiff(pid, v).keys()):
+                    prob = 1 - ((xnumberoflabels - 1) * 0.01)
+                    potential.set(potentialindex, prob)
+                    break
+                else:
+                    potential.set(potentialindex, 0.01)
+
+        # add potential to node
+        self.endnode.setPrior(potential)
+
+
+
 
     # get methods
+    def getName(self):
+        return self.name
     def getStartNode(self):
         return self.startnode
     def getEndNode(self):
-        return self.endnode
-    def getCptEndComponent(self):
-        return self.cptendcomponent
-    def getHealthPrior(self):
-        v = self.specs["Healths"]["1"]
-        return v["priorprobability"]
-    def getName(self):
-        return self.name
+        return self.endnode    
     
 
 
