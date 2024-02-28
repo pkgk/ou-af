@@ -8,8 +8,8 @@ class OopnBuilder():
     def __init__(self, assemblyspecs):
         self.assemblyspecs = assemblyspecs
         self.name = self.assemblyspecs['structure']["name"]
+        print("star building system: " + self.name)
         self.oopn = None
-        print("building system: " + self.name)
         self.components = []
         self.connections = []
         self.tests = []
@@ -32,26 +32,13 @@ class OopnBuilder():
             if (c["type"] == ctype):
                 return c
 
-    # helper to find a specific component by name in list of components
-    def findComponent(self, requestedcomponent):
-        for component in self.components:
-            if (component.getName() == requestedcomponent):
-                return component
 
-    # helper to determine start / end nodes based on list of existing components and connection specs
-    def determineConnectionStartEndNodes(self, connectionspecs, connection):
-        # determine startComponent: variablename
-        startcomponentobject = self.findComponent(connection["startComponent"])
-        endcomponentobject = self.findComponent(connection["endComponent"])
-        for label in startcomponentobject.getVariables():
-            if(re.search(connectionspecs["start"], label.name())):
-                startname = label.name()
-        for label in endcomponentobject.getVariables():
-            if(re.search(connectionspecs["end"], label.name())):
-                endname = label.name()
-        return (startname, endname)
+    def getComponentByName(self, name):
+        for c in self.components:
+            if (c.getName() == name): return c
+        print("Error finding component by name")
 
-    
+
     # create components objects
     # loop structure, find specs, create component object
     def createComponents(self):
@@ -68,8 +55,9 @@ class OopnBuilder():
         try:
             for k, conn in self.assemblyspecs["structure"]["connections"].items():
                 connectionspecs = self.getTypeSpecs("connections", conn["type"])
-                startendnames = self.determineConnectionStartEndNodes(connectionspecs, conn)
-                self.connections.append(Connection(conn["name"], connectionspecs,startendnames[0],startendnames[1]))
+                startcomponent = self.getComponentByName(conn["startComponent"])
+                endcomponent = self.getComponentByName(conn["endComponent"])                                         
+                self.connections.append(Connection(conn["name"], connectionspecs, startcomponent,endcomponent))
         except KeyError:
             print("KeyError, no connections found")
 
@@ -83,6 +71,8 @@ class OopnBuilder():
                     specs = testtype
                     self.tests.append(ObserveTest(testtype['name'], test["target"], specs))
         
-    def createAssembly(self):
-        self.oopn = Assembly(self.name, self.components, self.connections, self.tests)
+    def createOopn(self):
+        self.oopn = Oopn(self.name, self.components, self.connections, self.tests)
 
+    def getOopn(self):
+        return self.oopn

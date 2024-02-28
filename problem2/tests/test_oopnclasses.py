@@ -38,7 +38,7 @@ def test_CreateComponent():
           assert type(node.getPrior()) == pyAgrum.Potential   
 
 
-def test_createConnection():
+def test_createConnection():  
 
      component1 = Component("switch", switch)
      component2 = Component("light", light)

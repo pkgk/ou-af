@@ -311,15 +311,18 @@ class Connection:
         for node in self.endcomponent.getNodes():
             if (node.getName() == endnodename): self.endnode = node
 
-    
 
+    def keyToNodeName(self, key):
+        if re.search(key, self.startnode.getName()): return self.startnode.getName()
+        if re.search(key, self.endnode.getName()): return self.endnode.getName()
+        if re.search(key, self.healthnode.getName()): return self.healthnode.getName()
 
     # transforms the readable behavior table from specs to a format for use
     # during creation of a potential
     def transformBehaviorTable(self):
         cptDict = {}
         for k, v in self.specs['Behavior']['normal'].items():
-            var = k + self.getName()
+            var = self.keyToNodeName(k)
             count = 0
             for e in v:
                 if count in cptDict:
@@ -328,6 +331,7 @@ class Connection:
                 else:
                     cptDict[count] = {var: e}
                 count = count + 1
+        print(cptDict)
         return cptDict
 
 
@@ -336,6 +340,7 @@ class Connection:
         potential = self.endnode.getPrior()
         labelvar = self.startnode.getVariable()
         potential.add(labelvar)
+        potential.add(self.healthnode.getVariable())
         
         # second fill potential based on values from behavior table 
         behavior = self.transformBehaviorTable()
@@ -364,7 +369,9 @@ class Connection:
     def getStartNode(self):
         return self.startnode
     def getEndNode(self):
-        return self.endnode    
+        return self.endnode
+    def getHealthNode(self):
+        return self.healthnode    
     
 
 
@@ -427,7 +434,7 @@ class ObserveTest:
 
 # class assembly contains objects for all part of the system: components, connections, tests
 
-class Assembly:
+class Oopn:
     def __init__(self, name, components, connections, tests):
         self.name = name
         self.components = components

@@ -12,12 +12,11 @@ import pyAgrum as gum
 # loop components that are part of the system
 # get the variables representing inputs, outputs, health and add to diagram
 # add internal components arcs inputs > output + health > output
-def addBNNodesToDiagram(diagram, system):
-    for component in system.getComponents():
+def addBNNodesToDiagram(diagram, oopn):
+    for component in oopn.getComponents():
         print("adding component: " + component.getName())
-        variables = component.getVariables()
-        for item in variables:
-            diagram.addChanceNode(item)
+        for node in component.getNodes():
+            diagram.addChanceNode(node.getVariable())
         for connection in component.getInternalConnections():
             diagram.addArc(connection[0], connection[1])
 
@@ -25,11 +24,11 @@ def addBNNodesToDiagram(diagram, system):
 # loop connections that are part of the system
 # determine start / end components, add arc between them
 # add health to end component
-def addComponentConnectionsToDiagram(diagram, system):
-    for connection in system.getConnections():
-        hid = diagram.addChanceNode(connection.getHealthVariable())
-        start = connection.getStartNode()
-        end = connection.getEndNode()
+def addComponentConnectionsToDiagram(diagram, oopn):
+    for connection in oopn.getConnections():
+        hid = diagram.addChanceNode(connection.getHealthNode().getVariable())
+        start = connection.getStartNode().getName()
+        end = connection.getEndNode().getName()
         print("adding connection between: " + start + " and: " + end)
         diagram.addArc(start, end)
         diagram.addArc(hid, diagram.idFromName(end))
@@ -50,66 +49,40 @@ def hasParent(diagram, diagId):
         if (a[1] == diagId): return True
     return False          
 
-def setProbabilitiesComponents(diagram, system):
+def setProbabilitiesComponents(diagram, oopn):
 
     # loop components, determine nodes
-    for component in system.getComponents():
+    for component in oopn.getComponents():
         print("adding cpt for component: " + component.getName())
-        health = component.getHealthVarName()
-        inputs = component.getInputsVarNames()
-        output = component.getOutputsVarName()
-        
-        # check there are no parents, fill cpt from specs
-        if (hasParent(diagram, diagram.idFromName(health)) == False):        
-            diagram.cpt(diagram.idFromName(health)).fillWith(component.getHealthPrior())
-        for inputnode in inputs:
-            if(hasParent(diagram, diagram.idFromName(inputnode)) == False):
-                diagram.cpt(diagram.idFromName(inputnode)).fillWith(component.getInputPrior(inputnode))
-
-        # CPT has type Potential and contains tuples (Instantiations) of discrete variables as index
-        # loop in CPT, transform tuple to dict
-        # if dict is in normal behavior table: set P(0.9999), else 0.0001, not 0 to prevent problems during inference
-        # lookup is via DeepDiff, example:
-        # s = {'PresentPowerInputsLight': 'yes', 'PresentLightOutputsLight': 'yes', 'healthLight': 'ok'}
-        # t1 = {'PresentLightOutputsLight': 'no', 'PresentPowerInputsLight': 'yes', 'healthLight': 'ok'}
-        # DeepDiff(s, t1)
-        # result {'values_changed': {"root['PresentLightOutputsLight']": {'new_value': 'no', 'old_value': 'yes'}}}     
-        for tupleVars in diagram.cpt(diagram.idFromName(output)).loopIn():
-            t1 = tupleVars.todict()
-            for k, s in component.getCptOutput().items():
-                if ('values_changed' not in DeepDiff(s, t1).keys()):
-                    diagram.cpt(diagram.idFromName(output)).set(tupleVars, 0.9999)
-                    break   # necessary to prevent overwrite of 0.9999 with 0.0001 later-on     
-                else:
-                    diagram.cpt(diagram.idFromName(output)).set(tupleVars, 0.0001)        
+        for node in component.getNodes():
+            potentialoopn = node.getPrior()
+            potentialdiagram =  diagram.cpt(diagram.idFromName(node.getName())) 
+            if (potentialoopn.names == potentialdiagram.names):
+                potentialdiagram.fillWith((potentialoopn))
+            else:
+                print("potential not identical:" + str(node.getName()))
+                print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
 
 
 
 
 # determine probabilities (CPT) for variables of a connection
-
-
 def setProbabilitiesConnections(diagram, system):
 
     # loop connections, get endnode and normal behavior table
     for connection in system.getConnections():
         print("adding cpt for connection: " + connection.getName())
-        endnode = connection.getEndNode()
-        normalbehaviortable = connection.getCptEndComponent()
-
-        # loop cpt and check if state is known as normal behavior
-        for tupleVars in diagram.cpt(diagram.idFromName(endnode)).loopIn():
-            t1 = tupleVars.todict()
-            for k, s in normalbehaviortable.items():
-                if ('values_changed' not in DeepDiff(s, t1).keys()):
-                    diagram.cpt(diagram.idFromName(endnode)).set(tupleVars, 0.9999)  
-                    break
-                else:
-                    diagram.cpt(diagram.idFromName(endnode)).set(tupleVars, 0.0001)
 
         # set cpt for health
-        did = diagram.idFromName(connection.getHealthVariable().name())
-        diagram.cpt(did).fillWith(connection.getHealthPrior()) 
+        healthname = connection.getHealthNode().getName()
+        potentialdiagram = diagram.cpt(diagram.idFromName(healthname))
+        potentialoopn = connection.getHealthNode().getPrior()
+        if (potentialoopn.names == potentialdiagram.names):
+            potentialdiagram.fillWith((potentialoopn))
+        else:
+            print("potential not identical:" + str(healthname))
+            print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
+
 
 
 
@@ -270,16 +243,16 @@ def addTests(diagram, system):
 # MAIN builder 
 
 
-def diagramBuilder(diagram, system):
+def diagramBuilder(diagram, oopn):
     # add Bayes Network structure to diagram
-    addBNNodesToDiagram(diagram, system)
+    addBNNodesToDiagram(diagram, oopn)
 
     # add connections
-#    addComponentConnectionsToDiagram(diagram, system)
+    addComponentConnectionsToDiagram(diagram, oopn)
 
     # set prior probabilities for components and connections
-#    setProbabilitiesComponents(diagram, system)
-#    setProbabilitiesConnections(diagram, system)
+    setProbabilitiesComponents(diagram, oopn)
+    setProbabilitiesConnections(diagram, oopn)
 
     # add a "replace" decision per component + fill utility
 #    addReplaceDecisions(diagram, system)
