@@ -1,8 +1,9 @@
 import pytest
 import pyAgrum
-from problem2.src.oopnclasses import Component, Connection, Assembly, ObserveTest, Node
+from problem2.src.oopnclasses import Component, Connection, Oopn, ObserveOrReplaceTest, Node
 from problem2.specs.components import light, switch
 from problem2.specs.connections import wire
+from problem2.specs.tests import observeorreplacetest, testmappingswitch
 
 
 ### 
@@ -49,7 +50,27 @@ def test_createConnection():
 #     assert connection.setCptEndNode() == 2
 
 
-
+def test_ObserveOrReplaceTest():
+     component = Component("Switch", switch)
+     for key, test in testmappingswitch.items():
+          testname = test["test"]
+          testtarget = test["target"]
+          break
+     assert testname == "ObserveOrReplaceTest"
+     assert testtarget == "Switch"
+     ortest = ObserveOrReplaceTest(testname, component, observeorreplacetest)
+     assert type(ortest) == ObserveOrReplaceTest
+     assert ortest.getName() == "ObserveOrReplaceTest"
+     assert ortest.getTarget().getName() == "Switch"
+     assert ortest.getTestDecision().getName() == "DecisionObserveOrReplaceTestSwitch"
+     assert ortest.getTestUtility().getName() == "UtilityObserveOrReplaceTestSwitch"
+     assert ortest.getTestOutcome().getVariable().labels() == ("ok", "broken", "notdone")
+     assert ortest.getReplaceDecision().getName() == "DecisionReplaceSwitch"
+     assert ortest.getReplaceUtility().getVariable().labels() == ("0",)
+     assert type(ortest.getNodes()) == list
+     assert ortest.getInternalConnections()[0] == ("DecisionObserveOrReplaceTestSwitch", "UtilityObserveOrReplaceTestSwitch")
+     assert type(ortest.getTestOutcome().getPrior()) == pyAgrum.Potential
+     assert type(ortest.getTestUtility().getPrior()) == pyAgrum.Potential
 
 
      

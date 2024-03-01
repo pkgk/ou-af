@@ -30,15 +30,6 @@ switch = {
             "priorprobability":[0.99,0.01]
         }
     },
-    "Decisions":{
-        "1":{
-            "name":"Replace",
-            "values":["yes", "no"],
-            "replacementcosts": -2,
-            "incorrectreplacementcosts": -3,
-            "failuretorepaircosts": -4
-            }
-    },
     # normal behavior definition, example: all inputs:"yes" + output: "yes" + health:"ok" is a normal state (specified in "columns" below)
     "Behavior":{
         "normal": {

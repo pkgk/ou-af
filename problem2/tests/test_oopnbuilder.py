@@ -1,6 +1,6 @@
 import pytest
 import pyAgrum
-from src.oopnclasses import Component, Connection, Assembly, ObserveTest
+from src.oopnclasses import Component, Connection, Oopn, ObserveOrReplaceTest
 from src.oopnbuilder import OopnBuilder
 import specs.components as componentspecs
 import specs.connections as connectionspecs
@@ -15,7 +15,7 @@ def test_oopnbuilder():
     # system = light + replacedecision + test
     components = [componentspecs.light, componentspecs.switch]
     connections = [connectionspecs.wire, connectionspecs.wire2]
-    tests = [testspecs.testObserveHealth]
+    tests = [testspecs.observeorreplacetest]
     assembly = {
         "components"  : components,
         "connections" : connections,
@@ -26,9 +26,9 @@ def test_oopnbuilder():
 
     oopnbuilder = OopnBuilder(assembly)
     oopn = oopnbuilder.getOopn()
-    assert type(oopn) == Assembly
+    assert type(oopn) == Oopn
     assert oopn.getName() == "structure1"
     assert len(oopn.getComponents()) == 2
     assert len(oopn.getConnections()) == 1
-    assert len(oopn.getTests()) == 1
+    assert len(oopn.getTests()) == 0
 

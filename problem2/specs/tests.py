@@ -1,31 +1,44 @@
-testObserveHealth = {
-        "name":"TestObserveHealth",
+observeorreplacetest = {
+        "name":"ObserveOrReplaceTest",
         "typeUndertest":"Light",
-        "decisionvalues":["yes", "no"],
-        "testoutcomevalues":["ok","broken", "notdone"],
-        "testoutcomeToReplaceDecision": False,
-        "testcosts": -1,
-        "testoutcomecpt":{
-            'health':                           ["ok"       , "ok"      , "broken" , "broken"],
-            'DecisionTestObserveHealth':        ["no"      , "yes"      , "no"    , "yes"],
-            "TestOutcomeTestObserveHealth":     ["notdone"  , "ok" , "notdone" , "broken"]
+        "Testdecision":{
+            "values":["yes", "no"]
+        },
+        "TestUtility":{
+            "testcosts": -1,
+        },
+        "TestOutcome":{
+            "testoutcomevalues":["ok","broken", "notdone"],
+            "testoutcomeToReplaceDecision": False,
+            "testoutcomecpt":{
+                'health':                              ["ok"       , "ok"      , "broken"  , "broken"],
+                'DecisionObserveOrReplaceTest':        ["no"       , "yes"     , "no"      , "yes"],
+                "TestOutcomeObserveOrReplaceTest":     ["notdone"  , "ok"      , "notdone" , "broken"]
+                },
+        },
+        "Replacedecision":{
+                "name":"Replace",
+                "values":["yes", "no"],
+                "replacementcosts": -2,
+                "incorrectreplacementcosts": -3,
+                "failuretorepaircosts": -4
         }
     }
 
 testmapping1 = {
     "1":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light"
     }
 }
 
 testmapping2 = {
     "1":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light"
     },
     "2":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Switch"
     }
 }
@@ -34,15 +47,15 @@ testmapping2 = {
 
 testmapping3 = {
     "1":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light"
     },
     "2":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light1"
     },
     "3":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light2"
     }
 }
@@ -54,14 +67,14 @@ testmapping4 = {
 
 testmappinglight = {
     "1":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Light"
     }
 }
 
 testmappingswitch = {
     "1":{
-        "test":"TestObserveHealth",
+        "test":"ObserveOrReplaceTest",
         "target":"Switch"
     }
 }

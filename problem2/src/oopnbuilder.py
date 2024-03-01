@@ -1,6 +1,6 @@
 import pyAgrum as gum
 import re
-from src.oopnclasses import Component, Connection, ObserveTest, Assembly
+from src.oopnclasses import Component, Connection, ObserveOrReplaceTest, Oopn
 
 
 class OopnBuilder():
@@ -19,7 +19,7 @@ class OopnBuilder():
         print("number of connections: " + str(len(self.connections)))
         self.createTests()
         print("number of tests: " + str(len(self.tests)))
-        self.createAssembly()
+        self.createOopn()
 
 
 
@@ -68,8 +68,9 @@ class OopnBuilder():
         for k, test in self.assemblyspecs['testmapping'].items():
             for testtype in self.assemblyspecs["tests"]:
                 if (test["test"] == testtype["name"]):
+                    target = self.getComponentByName(test["target"])
                     specs = testtype
-                    self.tests.append(ObserveTest(testtype['name'], test["target"], specs))
+                    self.tests.append(ObserveOrReplaceTest(testtype['name'], target, specs))
         
     def createOopn(self):
         self.oopn = Oopn(self.name, self.components, self.connections, self.tests)
