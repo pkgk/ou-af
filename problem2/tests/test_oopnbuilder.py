@@ -30,5 +30,5 @@ def test_oopnbuilder():
     assert oopn.getName() == "structure1"
     assert len(oopn.getComponents()) == 2
     assert len(oopn.getConnections()) == 1
-    assert len(oopn.getTests()) == 0
+    assert len(oopn.getTests()) == 1
 

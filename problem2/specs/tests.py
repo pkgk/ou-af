@@ -40,7 +40,12 @@ testmapping2 = {
     "2":{
         "test":"ObserveOrReplaceTest",
         "target":"Switch"
+    },
+    "3":{
+        "test":"ObserveOrReplaceTest",
+        "target":"Wire"
     }
+
 }
 
 

@@ -34,15 +34,24 @@ class Node:
 # from the specs the internal variables are determined
 class Component:
     def __init__(self, name, specs):
-        self.name = name                                       # name of the component
-        self.specs = specs                                     # dict specifying component
-        self.nodes = []
-        self.internalconnections = []                          # internal arcs, list of tuples
-        self.createNodes()
-        self.setInternalConnections()
-        self.setPriorOutput()
-        self.setPriorHealth()
-        self.setPriorInputs()
+        # name component
+        self.name = name                   
+        # componentspecs type dict
+        self.specs = specs                 
+        # componentnodes, type Node
+        self.nodes = []                    
+        # arcs internal to component, list of tuples
+        self.internalconnections = []      
+        # turns specs into nodes
+        self.createNodes()                 
+        # turn specs into internal arcs
+        self.setInternalConnections()      
+        # prior outputnode, pyAgrum Potential
+        self.setPriorOutput()              
+        # prior healthnode, pyAgrum Potential
+        self.setPriorHealth()              
+        # prior inputs, pyAgrum Potential
+        self.setPriorInputs()              
 
 
     def createNodes(self):
@@ -405,14 +414,6 @@ class ObserveOrReplaceTest:
         self.setTestOutcomeCpt()
         self.setReplaceUtility()
 
-
-#        self.decisionvalues = self.specs["decisionvalues"]
-#        self.testoutcomevalues = self.specs["testoutcomevalues"]
-#        self.testcosts = self.specs["testcosts"]
-#        self.testoutcomecpt = {}
-#        self.setCptTestOutcomeNode()
-#        self.testoutcometargetnode = self.setTestOutcomeToReplaceDecision()
-
     def getName(self):
         return self.name
     def getTarget(self):
@@ -511,7 +512,6 @@ class ObserveOrReplaceTest:
 
         # secondly get behavior table
         behavior = self.transformBehaviorTable()
-        print(behavior)
         
         for potentialindex in p.loopIn():
             pid = potentialindex.todict()
@@ -522,7 +522,6 @@ class ObserveOrReplaceTest:
                     break
                 else:
                     p.set(potentialindex, 0.01)
-        print(p)        
 
         # add potential to node
         self.testoutcome.setPrior(p)
@@ -568,7 +567,6 @@ class ObserveOrReplaceTest:
                     utilitycosts = replacementcosts 
                 elif(not healthy and not replace):
                     utilitycosts = failuretorepaircosts
-            print(type(t))
             potential.set(t, utilitycosts)
         return potential
 

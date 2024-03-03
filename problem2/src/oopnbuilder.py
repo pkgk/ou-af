@@ -39,6 +39,12 @@ class OopnBuilder():
         print("Error finding component by name")
 
 
+    def getConnectionByName(self, name):
+        for c in self.connections:
+            if (c.getName() == name): return c
+        print("Error finding component by name")
+
+
     # create components objects
     # loop structure, find specs, create component object
     def createComponents(self):
@@ -69,6 +75,8 @@ class OopnBuilder():
             for testtype in self.assemblyspecs["tests"]:
                 if (test["test"] == testtype["name"]):
                     target = self.getComponentByName(test["target"])
+                    if (target == None):
+                        target = self.getConnectionByName(test["target"])
                     specs = testtype
                     self.tests.append(ObserveOrReplaceTest(testtype['name'], target, specs))
         

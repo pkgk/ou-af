@@ -69,15 +69,6 @@ light = {
             "priorprobability":[0.99,0.01]
         }
     },
-    "Decisions":{
-        "1":{
-            "name":"Replace",
-            "values":["yes", "no"],
-            "replacementcosts": -2,
-            "incorrectreplacementcosts": -3,
-            "failuretorepaircosts": -4
-        }
-    },
     "Behavior":{
         "normal": {
             'PresentPowerInputs':  ["yes", "no", "yes",    "no"], 
@@ -85,7 +76,6 @@ light = {
             'health':              ["ok",  "ok", "broken", "broken"]
         }
     }
-
 }
 
 
