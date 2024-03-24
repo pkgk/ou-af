@@ -1,6 +1,7 @@
 import pyAgrum as gum
 import re
-from src.oopnclasses import Component, Connection, ObserveOrReplaceTest, Oopn
+from src.oopnclasses import Component, Connection, Oopn, Node
+from src.testobservereplace import ObserveOrReplaceTest
 
 
 class OopnBuilder():
