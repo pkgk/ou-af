@@ -378,6 +378,8 @@ class Connection:
         return self.startnode
     def getEndNode(self):
         return self.endnode
+    def getConnectionNodes(self):
+        return (self.startnode.getName(), self.endnode.getName())
     def getHealthNode(self):
         return self.healthnode    
     

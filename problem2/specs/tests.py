@@ -25,12 +25,34 @@ observeorreplacetest = {
         }
     }
 
+
+changeinputtest = {
+        "name":"ChangeInputTest",
+        "typeUndertest":"Light",
+        "Testdecision":{
+            "values":["yes", "no"]
+        },
+        "TestUtility":{
+            "testcosts": -1,
+        }
+    }
+
+
+
 testmapping1 = {
     "1":{
         "test":"ObserveOrReplaceTest",
         "target":"Light"
     }
 }
+
+testmapping11 = {
+    "1":{
+        "test":"ChangeInputTest",
+        "target":"Light"
+    }
+}
+
 
 testmapping2 = {
     "1":{

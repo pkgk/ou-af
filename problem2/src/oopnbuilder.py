@@ -2,6 +2,7 @@ import pyAgrum as gum
 import re
 from src.oopnclasses import Component, Connection, Oopn, Node
 from src.testobservereplace import ObserveOrReplaceTest
+from src.testchangeinput import ChangeInputTest
 
 
 class OopnBuilder():
@@ -35,7 +36,7 @@ class OopnBuilder():
 
 
     def getComponentByName(self, name):
-        for c in self.components:
+        for c in self.components:   
             if (c.getName() == name): return c
         print("Error finding component by name")
 
@@ -44,6 +45,9 @@ class OopnBuilder():
         for c in self.connections:
             if (c.getName() == name): return c
         print("Error finding component by name")
+
+    def getConnections(self):
+        return self.connections
 
 
     # create components objects
@@ -69,17 +73,38 @@ class OopnBuilder():
             print("KeyError, no connections found")
 
 
+    # add observeorreplacetest 
+    def createObserveOrReplaceTest(self, target, name, specs):
+        # find targetcomponent
+        targetcomponent = self.getComponentByName(target)
+        # if target is no component then search connections
+        if (targetcomponent == None):
+            targetcomponent = self.getConnectionByName(target)
+        self.tests.append(ObserveOrReplaceTest(name, targetcomponent, specs))
+
+
+    # add observeorreplacetest 
+    def createChangeInputTest(self, target, name, specs ):
+        targetcomponent = self.getComponentByName(target)
+        if (targetcomponent == None):
+            targetcomonent = self.getConnectionByName(target)
+        self.tests.append(ChangeInputTest(name, targetcomponent, specs))
+
+
     # create Test objects
     # loop the testmapping specification, find test specs + targetnode, create testobject
     def createTests(self):
+        # loop tests defined in mapping
         for k, test in self.assemblyspecs['testmapping'].items():
-            for testtype in self.assemblyspecs["tests"]:
-                if (test["test"] == testtype["name"]):
-                    target = self.getComponentByName(test["target"])
-                    if (target == None):
-                        target = self.getConnectionByName(test["target"])
-                    specs = testtype
-                    self.tests.append(ObserveOrReplaceTest(testtype['name'], target, specs))
+            testtype = test["test"]
+            target = test["target"]
+            # loop available specs for tests until the right spec for test from mapping is found
+            for testspec in self.assemblyspecs["tests"]:
+                if (testtype == testspec["name"]):
+                    if (testtype == "ObserveOrReplaceTest"):
+                        self.createObserveOrReplaceTest(target, testtype, testspec)
+                    if (testtype == "ChangeInputTest"):
+                        self.createChangeInputTest(target, testtype, testspec)
         
     def createOopn(self):
         self.oopn = Oopn(self.name, self.components, self.connections, self.tests)

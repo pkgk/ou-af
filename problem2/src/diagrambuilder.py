@@ -89,7 +89,7 @@ def transferPotential(diagram, node):
 
 
 
-def addObserveOrReplaceTests(diagram, oopn):
+def addTests(diagram, oopn):
     for test in oopn.getTests():
         print("adding test: " + test.getName())
         for node in test.getNodes():
@@ -133,6 +133,6 @@ def diagramBuilder(diagram, oopn):
     setProbabilitiesConnections(diagram, oopn)
 
     # add ObserveOrReplacetests
-    addObserveOrReplaceTests(diagram, oopn)
+    addTests(diagram, oopn)
 
     return diagram
