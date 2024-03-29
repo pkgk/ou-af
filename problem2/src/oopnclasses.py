@@ -33,13 +33,16 @@ class Node:
 # the component is defined by it's name and specs (a dict)
 # from the specs the internal variables are determined
 class Component:
-    def __init__(self, name, specs):
+    def __init__(self, name, specs, givennodes):    
         # name component
         self.name = name                   
         # componentspecs type dict
         self.specs = specs                 
         # componentnodes, type Node
-        self.nodes = []                    
+        if (len(givennodes) > 0):
+            self.nodes = givennodes
+        else:
+            self.nodes = []                    
         # arcs internal to component, list of tuples
         self.internalconnections = []      
         # turns specs into nodes
@@ -54,7 +57,19 @@ class Component:
         self.setPriorInputs()              
 
 
+
+    def findNodeByPartOfName(self, partlyname):
+        result = None
+        for node in self.nodes:
+            if partlyname in node.getName():
+                result = True
+                break
+        if result: return True
+        else: return False
+
+
     def createNodes(self):
+        print("createNodes" + str(len(self.nodes)))
         # create outputnode
         v = self.specs["Outputs"]["1"]
         varname = str( v['property'] + v['modality']+ "Outputs" + self.name)
@@ -66,11 +81,16 @@ class Component:
             varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
             node = Node(varname, "Input", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
             self.nodes.append(node)
+        
         # create health node
         v = self.specs["Healths"]["1"]
-        varname = str(v["property"] + self.name)
-        node = Node(varname, "Health", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
-        self.nodes.append(node)
+        varname = str(v["property"])
+        print(self.findNodeByPartOfName(varname) )
+        if (self.findNodeByPartOfName(varname) == False):
+            print("kom hier niet")
+            varname = varname + self.name
+            node = Node(varname, "Health", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+            self.nodes.append(node)
         
 
     # define the connections that are internal to the component
@@ -146,12 +166,13 @@ class Component:
 
 
     # set the prior of the health node
-    # assumption is health has states ok / broken and specs contains [0.99, 0.01]
+    # assumption is health has states ok / broken    and specs contains [0.99, 0.01]
     def setPriorHealth(self):
         # get prior from spec, health has no parents
         p = self.specs["Healths"]["1"]["priorprobability"]
         hnode = self.getHealthNode()
-        hnode.setPrior(self.generateInstantiationTuples([hnode.getVariable()], p))
+        if (hnode.getPrior != None):        #given node already has prior
+            hnode.setPrior(self.generateInstantiationTuples([hnode.getVariable()], p))
 
 
     def findInputPriorFromSpecs(self, inputname):
@@ -402,4 +423,20 @@ class Oopn:
         return self.connections
     def getTests(self):
         return self.tests
+    
+    def findComponentFromNodeName(self, nodename):
+        foundcomp = None
+        for comp in self.components:
+            for node in comp.getNodes():
+                if (nodename == node.getName()):
+                    foundcomp = comp
+                    break
+        return foundcomp
+    
+    def addComponent(self, component):
+        if (type(component) == Component):
+            self.components.append(component)
+        else: print("error: type not component, cannot add to list of components")
+                
+
     

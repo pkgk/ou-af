@@ -11,7 +11,10 @@ def addBNNodesToDiagram(diagram, oopn):
     for component in oopn.getComponents():
         print("adding component: " + component.getName())
         for node in component.getNodes():
-            diagram.addChanceNode(node.getVariable())
+            if (diagram.exists(node.getName()) == True):
+               print("duplicate" + node.getName())
+            else:
+               diagram.addChanceNode(node.getVariable())
         for connection in component.getInternalConnections():
             diagram.addArc(connection[0], connection[1])
 

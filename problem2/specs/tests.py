@@ -49,7 +49,7 @@ testmapping1 = {
 testmapping11 = {
     "1":{
         "test":"ChangeInputTest",
-        "target":"Light"
+        "target":"Light2"
     }
 }
 

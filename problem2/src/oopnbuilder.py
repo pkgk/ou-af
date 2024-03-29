@@ -50,6 +50,7 @@ class OopnBuilder():
         return self.connections
 
 
+
     # create components objects
     # loop structure, find specs, create component object
     def createComponents(self):
@@ -58,7 +59,7 @@ class OopnBuilder():
             # read specs for component type
             specs = self.getTypeSpecs("components", component['type'])
             # create new Component object + append to list
-            self.components.append(Component(component["name"], specs))
+            self.components.append(Component(component["name"], specs, []))
 
     # create connections objects
     # loop connections in structure, find specs and start/end components,  create connection object
