@@ -12,7 +12,7 @@ def addBNNodesToDiagram(diagram, oopn):
         print("adding component: " + component.getName())
         for node in component.getNodes():
             if (diagram.exists(node.getName()) == True):
-               print("duplicate" + node.getName())
+               print("node not added, already exists in diagram" + node.getName())
             else:
                diagram.addChanceNode(node.getVariable())
         for connection in component.getInternalConnections():
@@ -50,7 +50,7 @@ def setProbabilitiesComponents(diagram, oopn):
             if (potentialoopn.names == potentialdiagram.names):
                 potentialdiagram.fillWith((potentialoopn))
             else:
-                print("potential not identical:" + str(node.getName()))
+                print("potential node not identical to potential in diagram:" + str(node.getName()))
                 print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
 
 
@@ -70,7 +70,7 @@ def setProbabilitiesConnections(diagram, system):
         if (potentialoopn.names == potentialdiagram.names):
             potentialdiagram.fillWith((potentialoopn))
         else:
-            print("potential not identical:" + str(healthname))
+            print("potential node not identical to potential in diagram:" + str(healthname))
             print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
 
 
@@ -87,7 +87,7 @@ def transferPotential(diagram, node):
     if (potentialoopn.names == potentialdiagram.names):
         potentialdiagram.fillWith((potentialoopn))
     else:
-        print("potential not identical:" + str(node.getName()))
+        print("potential node not identical to potential in diagram:" + str(node.getName()))
         print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
 
 

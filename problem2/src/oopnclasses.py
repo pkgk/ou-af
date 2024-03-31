@@ -1,6 +1,7 @@
 import pyAgrum as gum
 import re
 from deepdiff import DeepDiff
+import networkx as nx
 
 
 
@@ -37,7 +38,9 @@ class Component:
         # name component
         self.name = name                   
         # componentspecs type dict
-        self.specs = specs                 
+        self.specs = specs         
+        # type
+        self.type = specs['type']        
         # componentnodes, type Node
         if (len(givennodes) > 0):
             self.nodes = givennodes
@@ -69,7 +72,6 @@ class Component:
 
 
     def createNodes(self):
-        print("createNodes" + str(len(self.nodes)))
         # create outputnode
         v = self.specs["Outputs"]["1"]
         varname = str( v['property'] + v['modality']+ "Outputs" + self.name)
@@ -78,16 +80,18 @@ class Component:
 
         # create input nodes
         for k, v in self.specs["Inputs"].items():
-            varname = str( v['property'] + v['modality']+ "Inputs" + self.name)
-            node = Node(varname, "Input", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
-            self.nodes.append(node)
+            varname = str( v['property'] + v['modality']+ "Inputs")
+            # determine if node was given and already in list of nodes
+            if (self.findNodeByPartOfName(varname) == False):
+                varname = varname + self.name
+                node = Node(varname, "Input", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
+                self.nodes.append(node)
         
         # create health node
         v = self.specs["Healths"]["1"]
         varname = str(v["property"])
-        print(self.findNodeByPartOfName(varname) )
+        # determine if node was given
         if (self.findNodeByPartOfName(varname) == False):
-            print("kom hier niet")
             varname = varname + self.name
             node = Node(varname, "Health", gum.LabelizedVariable(varname, varname, v['propertyvalues']))
             self.nodes.append(node)
@@ -185,13 +189,17 @@ class Component:
 
     def setPriorInputs(self):
         for node in self.getInputNodes():
-            p = self.findInputPriorFromSpecs(node.getName())
-            node.setPrior(self.generateInstantiationTuples([node.getVariable()], p))
+            if (type(node.getPrior()) != gum.Potential):
+                p = self.findInputPriorFromSpecs(node.getName())
+                node.setPrior(self.generateInstantiationTuples([node.getVariable()], p))
 
-                                           
+
+
+    # vars: labelized variables
     def generateInstantiationTuples(self, vars, priors):
         pot = gum.Potential()
         i = gum.Instantiation()
+
         for v in vars:
             pot.add(v)
             i.add(v)
@@ -216,6 +224,9 @@ class Component:
     # name of component as string
     def getName(self):
         return self.name
+    
+    def getType(self):
+        return self.type
 
     # variables for component as pyAgrum  list of variables
     def getNodeVariables(self):
@@ -276,6 +287,8 @@ class Component:
             if (node.getName() == "inputitem"):
                 return node.getPrior()
     
+    def getSpecs(self):
+        return self.specs
 
 
 
@@ -306,15 +319,24 @@ class Connection:
     def setHealthVariable(self):
         label = "health" + self.name
         v = self.specs["Healths"]["1"]
-        self.healthnode = Node(label, "Health", gum.LabelizedVariable(label, label, v['propertyvalues']))
+        if (v != None):
+            self.healthnode = Node(label, "Health", gum.LabelizedVariable(label, label, v['propertyvalues']))
+        else: print("Connection/setHealthVariable: no description for health " + self.name)
 
     # set the prior of the health node
     # assumption is health has states ok / broken and specs contains [0.99, 0.01]
     def setPriorHealth(self):
         # get prior from spec, health has no parents
         p = self.specs["Healths"]["1"]["priorprobability"]
-        self.healthnode.setPrior(self.generateInstantiationTuples([self.healthnode.getVariable()], p))
+        if (p != None):
+            self.healthnode.setPrior(self.generateInstantiationTuples([self.healthnode.getVariable()], p))
+        else: print("Connection/setPriorHealth: no description for prio of health " + self.name)
 
+
+    # create Potential for variables in vars with priors from list
+    # Instantiation is index for Potential
+    # vars: variables list to fill Potential
+    # priors: given priors
     def generateInstantiationTuples(self, vars, priors):
         pot = gum.Potential()
         i = gum.Instantiation()
@@ -330,16 +352,19 @@ class Connection:
         return pot
 
 
-
+    # determine start and end nodes by taking beginning of nodename from specs + component name
     def setStartEndNodes(self):
         startnodename = str(self.specs['start'] + self.startcomponent.getName())
         for node in self.startcomponent.getNodes():
-            if (node.getName() == startnodename): self.startnode = node
-            break
+            if (node.getName() == startnodename): 
+                self.startnode = node
+                break
 
         endnodename = str(self.specs['end'] + self.endcomponent.getName())
         for node in self.endcomponent.getNodes():
-            if (node.getName() == endnodename): self.endnode = node
+            if (node.getName() == endnodename): 
+                self.endnode = node
+                break
 
 
     def keyToNodeName(self, key):
@@ -364,12 +389,15 @@ class Connection:
         return cptDict
 
 
+    # determine probability table for end node
     def setCptEndNode(self):
-        # first extend potential
-        potential = self.endnode.getPrior()
-        labelvar = self.startnode.getVariable()
-        potential.add(labelvar)
-        potential.add(self.healthnode.getVariable())
+        if (type(self.startnode) == Node and type(self.endnode) == Node):
+            # first extend potential
+            potential = self.endnode.getPrior()
+            labelvar = self.startnode.getVariable()
+            potential.add(labelvar)
+            potential.add(self.healthnode.getVariable())
+        else: print("Connection/setCptEndNode: start or endnode for connection not set " + self.name)
         
         # second fill potential based on values from behavior table 
         behavior = self.transformBehaviorTable()
@@ -403,6 +431,8 @@ class Connection:
         return (self.startnode.getName(), self.endnode.getName())
     def getHealthNode(self):
         return self.healthnode    
+    def getSpecs(self):
+        return self.specs
     
 
 
@@ -438,5 +468,86 @@ class Oopn:
             self.components.append(component)
         else: print("error: type not component, cannot add to list of components")
                 
+    def addConnection(self, con):
+        if (type(con) == Connection):
+            self.connections.append(con)
+        else: print("error adding connection, type not correct")
 
     
+    def getAllNodeNames(self):
+        nodenamelist = []
+        for c in self.components:
+            for n in c.getNodes():
+                nodenamelist.append(n.getName())
+        return nodenamelist
+
+    def getAllConnections(self):
+        connectionlist = [] 
+        for c in self.components:
+            for ic in c.getInternalConnections():
+                connectionlist.append(ic)
+        for con in self.connections:
+            connectionlist.append(con.getConnectionNodes())
+        return connectionlist
+    
+    def determinePathStartToFinish(self, nodes, connections, start, finish):
+        G = nx.DiGraph()
+        G.add_nodes_from(nodes)
+        G.add_edges_from(connections)
+        if (nx.has_path(G, start, finish)):
+            return nx.shortest_path(G, start, finish)
+        else: print('Error no path available')
+
+    # derive a list of unique components in path
+    def determineComponentsInNodesPath(self, path):
+        componentlist = []
+        for nodename in path:
+            component = self.findComponentFromNodeName(nodename)
+            componentnodes = component.getNodes()
+            for cn in componentnodes:
+                if (nodename == cn.getName()):
+                    if (len(componentlist) > 0):
+                        if (componentlist[-1] != component.getName()):
+                            componentlist.append(component.getName())
+                    else:
+                        componentlist.append(component.getName())            
+        return componentlist
+
+    def findComponentByName(self, name):
+        for component in self.getComponents():
+            if component.getName() == name:
+                return component
+            
+
+    def copyPathType2Test(self, startnode, endnode):
+        # create DAG and determine path from startnode to finishnode
+        nodepath = self.determinePathStartToFinish(self.getAllNodeNames(),self.getAllConnections(), startnode, endnode )
+
+        # add copied components to OOPN
+        # first determine all components part of path and loop one by one
+        for componentname in self.determineComponentsInNodesPath(nodepath):
+            component = self.findComponentByName(componentname)
+            # determine nodes not in nodepath > mark for reuse when creating copy
+            reusenodes = []
+            for node in component.getNodes():
+                if (node.getName() in nodepath):
+                    pass
+                else:
+                    reusenodes.append(node)
+            # determine name of copied component
+            newname = componentname + "copy"
+            print("adding component: " + newname)
+            # create a copy component and add to oopn
+            self.addComponent(Component(newname, component.getSpecs(), reusenodes))
+    
+        # add copied connections to OOPN
+        for i in range(0, len(nodepath)-1):
+            # create a connection tuple with next node
+            nodepathtuple = (nodepath[i], nodepath[i+1])
+            # check if tuple is existing connection, if so create a copy
+            for con in self.getConnections():
+                if nodepathtuple == con.getConnectionNodes():
+                    startcomponent = self.findComponentFromNodeName(str(nodepathtuple[0]) + "copy")
+                    endcomponent = self.findComponentFromNodeName(str(nodepathtuple[1]) + "copy")
+                    print("adding connection between: " + startcomponent.getName() + " and " + endcomponent.getName())
+                    self.addConnection(Connection(con.getName() + 'copy', con.getSpecs(), startcomponent, endcomponent))

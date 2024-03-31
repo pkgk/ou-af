@@ -10,7 +10,7 @@ class OopnBuilder():
     def __init__(self, assemblyspecs):
         self.assemblyspecs = assemblyspecs
         self.name = self.assemblyspecs['structure']["name"]
-        print("star building system: " + self.name)
+        print("start building system: " + self.name)
         self.oopn = None
         self.components = []
         self.connections = []
