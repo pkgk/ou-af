@@ -300,14 +300,14 @@ class Component:
 # a connection is defined by it's name, specs (dict) and start + end components
 
 class Connection:
-    def __init__(self, name, specs, startcomponent, endcomponent):
+    def __init__(self, name, specs, startcomponent, endcomponent, healthnode):
         self.name = name                                     # name of the connection
         self.specs = specs                                   # dict specifying properties of connection
         self.startcomponent = startcomponent
         self.endcomponent = endcomponent
         self.startnode = None                                # node that is starting point for connection
         self.endnode = None                                  # node that is ending point for connection
-        self.healthnode = None
+        self.healthnode = healthnode
         self.cptendcomponent = None
         self.setHealthVariable()
         self.setPriorHealth()
@@ -317,11 +317,12 @@ class Connection:
         
     # create pyAgrum labelized variable used when adding health for connection to diagram
     def setHealthVariable(self):
-        label = "health" + self.name
-        v = self.specs["Healths"]["1"]
-        if (v != None):
-            self.healthnode = Node(label, "Health", gum.LabelizedVariable(label, label, v['propertyvalues']))
-        else: print("Connection/setHealthVariable: no description for health " + self.name)
+        if (self.healthnode == None):
+            label = "health" + self.name
+            v = self.specs["Healths"]["1"]
+            if (v != None):
+                self.healthnode = Node(label, "Health", gum.LabelizedVariable(label, label, v['propertyvalues']))
+            else: print("Connection/setHealthVariable: no description for health " + self.name)
 
     # set the prior of the health node
     # assumption is health has states ok / broken and specs contains [0.99, 0.01]
@@ -416,8 +417,6 @@ class Connection:
 
         # add potential to node
         self.endnode.setPrior(potential)
-
-
 
 
     # get methods
@@ -549,5 +548,7 @@ class Oopn:
                 if nodepathtuple == con.getConnectionNodes():
                     startcomponent = self.findComponentFromNodeName(str(nodepathtuple[0]) + "copy")
                     endcomponent = self.findComponentFromNodeName(str(nodepathtuple[1]) + "copy")
-                    print("adding connection between: " + startcomponent.getName() + " and " + endcomponent.getName())
-                    self.addConnection(Connection(con.getName() + 'copy', con.getSpecs(), startcomponent, endcomponent))
+                    healthnode = con.getHealthNode()
+                    print("adding connection " +  con.getName() + 'copy' + " between: " + startcomponent.getName() + " and " + endcomponent.getName() + " with healthnode: " + healthnode.getName())
+                    newcon = Connection(con.getName() + 'copy', con.getSpecs(), startcomponent, endcomponent, healthnode)
+                    self.addConnection(newcon)

@@ -24,12 +24,16 @@ def addBNNodesToDiagram(diagram, oopn):
 # add health to end component
 def addComponentConnectionsToDiagram(diagram, oopn):
     for connection in oopn.getConnections():
-        hid = diagram.addChanceNode(connection.getHealthNode().getVariable())
         start = connection.getStartNode().getName()
         end = connection.getEndNode().getName()
         print("adding connection between: " + start + " and: " + end)
         diagram.addArc(start, end)
-        diagram.addArc(hid, diagram.idFromName(end))
+        if (diagram.exists(connection.getHealthNode().getName()) == True):
+            print("node not added, already exists in diagram" + connection.getHealthNode().getName())
+            diagram.addArc(diagram.idFromName(connection.getHealthNode().getName()), diagram.idFromName(end))
+        else:
+            hid = diagram.addChanceNode(connection.getHealthNode().getVariable())
+            diagram.addArc(hid, diagram.idFromName(end))
 
 
 # determine probabilities (CPT) for variables of a component

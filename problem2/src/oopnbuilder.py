@@ -69,7 +69,7 @@ class OopnBuilder():
                 connectionspecs = self.getTypeSpecs("connections", conn["type"])
                 startcomponent = self.getComponentByName(conn["startComponent"])
                 endcomponent = self.getComponentByName(conn["endComponent"])                                         
-                self.connections.append(Connection(conn["name"], connectionspecs, startcomponent,endcomponent))
+                self.connections.append(Connection(conn["name"], connectionspecs, startcomponent,endcomponent, None))
         except KeyError:
             print("KeyError, no connections found")
 
