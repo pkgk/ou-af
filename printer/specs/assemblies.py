@@ -1,0 +1,64 @@
+printerassembly = {
+    "name":"printer",
+    "components": {
+        "1":{
+            "name":"wiper",
+            "type":"wiper"
+            },
+        "2":{
+            "name":"lens",
+            "type":"lens"           
+            },
+        "3":{
+            "name":"tilted_mirror",
+            "type":"tilted_mirror"           
+            },
+        "4":{
+            "name":"developer_roll",
+            "type":"developer_roll"           
+            },
+        "5":{
+            "name":"charge_roll",
+            "type":"charge_roll"           
+            },
+        "6":{
+            "name":"drum",
+            "type":"drum"           
+            }             
+        },
+    "connections":{
+        "1":{
+            "name":"wipercontact",
+            "type":"wipercontact",
+            "startComponent":"wiper",
+            "endComponent":"drum"
+        },
+        "2":{
+            "name":"laserbeam",
+            "type":"laserbeam",
+            "startComponent":"lens",
+            "endComponent":"tilted_mirror"
+        },
+        "3":{
+            "name":"rollcontact",
+            "type":"rollcontact",
+            "startComponent":"developer_roll",
+            "endComponent":"drum"
+        },
+        "4":{
+            "name":"charge",
+            "type":"charge",
+            "startComponent":"charge_roll",
+            "endComponent":"drum"
+        },
+        "5":{
+            "name":"movingbeam",
+            "type":"movingbeam",
+            "startComponent":"tilted_mirror",
+            "endComponent":"drum"
+        }        
+
+   
+    }    
+}
+
