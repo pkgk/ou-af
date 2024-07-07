@@ -29,6 +29,10 @@ observeorreplacetest = {
 changeinputtest = {
         "name":"ChangeInputTest",
         "typeUndertest":"Light",
+        "componentChain":{
+            "start":"PresentPowerInputsSwitch",
+            "end":"PresentLightOutputsLight"
+        },
         "Testdecision":{
             "values":["yes", "no"]
         },
@@ -90,6 +94,15 @@ testmapping3 = {
 testmapping4 = {
 
 }
+
+testmapping5 = {
+    "1":{
+        "test":"ChangeInputTest",
+        "target":"Switch"
+
+    }
+}
+
 
 
 testmappinglight = {

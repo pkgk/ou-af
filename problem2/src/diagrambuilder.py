@@ -123,6 +123,8 @@ def addTests(diagram, oopn):
                 transferPotential(diagram, node)
                 
 
+def addSystemHealth(diagram.oopn):
+    pass 
 
 #######################################################################
 # MAIN builder 
@@ -141,5 +143,7 @@ def diagramBuilder(diagram, oopn):
 
     # add ObserveOrReplacetests
     addTests(diagram, oopn)
+
+    addSystemHealth(diagram.oopn)
 
     return diagram

@@ -29,6 +29,11 @@ class Node:
 
 
 
+class SystemHealth:
+    def __init__(self, name, healthnodes):
+        self.name - name
+        
+
 
 # this class models a component in the system
 # the component is defined by it's name and specs (a dict)
@@ -437,6 +442,8 @@ class Connection:
 
 
 # class assembly contains objects for all part of the system: components, connections, tests
+# Oopn also supports copying part of the network to support type 2 tests
+# oopn also support setting a system health variable
 
 class Oopn:
     def __init__(self, name, components, connections, tests):
@@ -444,6 +451,8 @@ class Oopn:
         self.components = components
         self.connections = connections
         self.tests = tests
+        self.systemhealth = None
+
     def getName(self):
         return self.name
     def getComponents(self):
@@ -452,6 +461,7 @@ class Oopn:
         return self.connections
     def getTests(self):
         return self.tests
+
     
     def findComponentFromNodeName(self, nodename):
         foundcomp = None
@@ -489,6 +499,11 @@ class Oopn:
             connectionlist.append(con.getConnectionNodes())
         return connectionlist
     
+
+    def setSystemHealth(self):
+        pass
+
+    # helper to copying components
     def determinePathStartToFinish(self, nodes, connections, start, finish):
         G = nx.DiGraph()
         G.add_nodes_from(nodes)
@@ -518,6 +533,7 @@ class Oopn:
                 return component
             
 
+    # enable copying of nodes due to the type 2 test
     def copyPathType2Test(self, startnode, endnode):
         # create DAG and determine path from startnode to finishnode
         nodepath = self.determinePathStartToFinish(self.getAllNodeNames(),self.getAllConnections(), startnode, endnode )

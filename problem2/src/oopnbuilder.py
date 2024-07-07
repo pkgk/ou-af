@@ -4,29 +4,30 @@ from src.oopnclasses import Component, Connection, Oopn, Node
 from src.testobservereplace import ObserveOrReplaceTest
 from src.testchangeinput import ChangeInputTest
 
+# class generates objects for components, connections and tests to form a object oriented probebility network
+# inputs: specifications of components, connections and test stored as dictionaries in /specs directory
 
 class OopnBuilder():
 
+    # objects for components, connections and test are generated and stored when OopnBuilder object is created
     def __init__(self, assemblyspecs):
         self.assemblyspecs = assemblyspecs
         self.name = self.assemblyspecs['structure']["name"]
         print("start building system: " + self.name)
-        self.oopn = None
+
+        # variable list to store components, connectinos and tests
         self.components = []
         self.connections = []
         self.tests = []
+
+        # create components, connections and tests
         self.createComponents()
         print("number of components: " + str(len(self.components)))
         self.createConnections()
         print("number of connections: " + str(len(self.connections)))
         self.createTests()
         print("number of tests: " + str(len(self.tests)))
-        self.createOopn()
 
-
-
-    def getOopn(self):
-        return self.oopn
 
     # helper to find a specification that matches a given type
     def getTypeSpecs(self, group, ctype):
@@ -84,7 +85,7 @@ class OopnBuilder():
         self.tests.append(ObserveOrReplaceTest(name, targetcomponent, specs))
 
 
-    # add observeorreplacetest 
+    # add changeinputtest
     def createChangeInputTest(self, target, name, specs ):
         targetcomponent = self.getComponentByName(target)
         if (targetcomponent == None):
@@ -106,9 +107,7 @@ class OopnBuilder():
                         self.createObserveOrReplaceTest(target, testtype, testspec)
                     if (testtype == "ChangeInputTest"):
                         self.createChangeInputTest(target, testtype, testspec)
-        
-    def createOopn(self):
-        self.oopn = Oopn(self.name, self.components, self.connections, self.tests)
 
+    # create Oopn object to contain all compoonents, connects an tests and return it    
     def getOopn(self):
-        return self.oopn
+        return Oopn(self.name, self.components, self.connections, self.tests)
