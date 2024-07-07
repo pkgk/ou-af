@@ -1,0 +1,1 @@
+- Alleen de behaviour vastleggen voor als er ouput is. De andere gevallen is de "else". Ook de output als laatste opie noemen in de "normal" dictionary.
