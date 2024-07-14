@@ -79,6 +79,26 @@ def setProbabilitiesConnections(diagram, system):
 
 
 
+# method to add a sytemhealth variable to the diagram
+def addSystemHealth(diagram, oopn):
+    sh = oopn.getSystemHealth()
+    print("adding systemHealth variable: ")
+    diagram.addChanceNode(sh.getNode().getVariable())
+
+    print("adding systemhealth connections")
+    for healthnode in sh.getHealthNodes():
+        diagram.addArc(healthnode.getName(), sh.getName())
+
+    potentialoopn = sh.getNode().getPrior()
+    potentialdiagram =  diagram.cpt(diagram.idFromName(sh.getNode().getName())) 
+    if (potentialoopn.names == potentialdiagram.names):
+        potentialdiagram.fillWith((potentialoopn))
+    else:
+         print("potential node not identical to potential in diagram:" + str(sh.getNode().getName()))
+         print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
+
+
+
 def transferPotential(diagram, node):
     potentialoopn = node.getPrior()
 
@@ -122,24 +142,6 @@ def addTests(diagram, oopn):
                 print("adding cpt to: " + node.getName())
                 transferPotential(diagram, node)
 
-
-# method to add a sytemhealth variable to the diagram
-def addSystemHealth(diagram, oopn):
-    sh = oopn.getSystemHealth()
-    print("adding systemHealth variable: ")
-    diagram.addChanceNode(sh.getNode().getVariable())
-
-    print("adding systemhealth connections")
-    for healthnode in sh.getHealthNodes():
-        diagram.addArc(healthnode.getName(), sh.getName())
-
-    potentialoopn = sh.getNode().getPrior()
-    potentialdiagram =  diagram.cpt(diagram.idFromName(sh.getNode().getName())) 
-    if (potentialoopn.names == potentialdiagram.names):
-        potentialdiagram.fillWith((potentialoopn))
-    else:
-         print("potential node not identical to potential in diagram:" + str(sh.getNode().getName()))
-         print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
 
 
 

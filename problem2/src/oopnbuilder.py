@@ -21,16 +21,17 @@ class OopnBuilder():
         self.tests = []
         self.systemhealth = None
 
+        self.oopn = Oopn(self.name, self.components, self.connections, self.tests, self.systemhealth)
         # create components, connections and tests
         self.createComponents()
         print("number of components: " + str(len(self.components)))
         self.createConnections()
         print("number of connections: " + str(len(self.connections)))
+        if (self.assemblyspecs["structure"]["systemhealth"] == "yes"):
+            self.oopn.setSystemHealth(self.createSystemHealth())
+            print("added systemHealth")
         self.createTests()
         print("number of tests: " + str(len(self.tests)))
-        if (self.assemblyspecs["structure"]["systemhealth"] == "yes"):
-            self.createSystemHealth()
-            print("added systemHealth")
 
 
     # helper to find a specification that matches a given type
@@ -94,6 +95,10 @@ class OopnBuilder():
         targetcomponent = self.getComponentByName(target)
         if (targetcomponent == None):
             targetcomonent = self.getConnectionByName(target)
+        start = specs["componentChain"]["start"]
+        end = specs["componentChain"]["end"]
+        # duplicate the nodes of the chain given in the specs
+        self.oopn.copyPathType2Test(start, end)
         self.tests.append(ChangeInputTest(name, targetcomponent, specs))
 
 
@@ -124,10 +129,11 @@ class OopnBuilder():
         return healthnodes
     
     def createSystemHealth(self):
-        self.systemhealth = SystemHealth("systemhealth", self.getHealthNodes())
-        print(self.systemhealth)
+        return SystemHealth("systemhealth", self.getHealthNodes())
+
+
 
 
     # create Oopn object to contain all compoonents, connects an tests and return it    
     def getOopn(self):
-        return Oopn(self.name, self.components, self.connections, self.tests, self.systemhealth)
+        return self.oopn

@@ -51,8 +51,17 @@ class ChangeInputTest:
 
     # create internal connections + interface with Output Node of target component
     def setInternalConnections(self):
-        self.internalconnections.append( (self.testdecision.getName(), self.testutility.getName() ))
-        self.internalconnections.append( (self.targetcomponent.getOutputNode().getName(), self.testutility.getName() ))
+        duplicatedInputNode = self.specs["componentChain"]["start"] 
+        # decision > duplicated inputnode
+        self.internalconnections.append( (self.testdecision.getName(), duplicatedInputNode + "copy" ))
+        # system outputnode > decision
+        self.internalconnections.append( (self.targetcomponent.getOutputNode().getName(), self.testdecision.getName() ))
+        # duplicated inputnode > utility
+        self.internalconnections.append( (duplicatedInputNode + "copy", self.testutility.getName()))
+        # systemhealth > utility
+        self.internalconnections.append( ("systemhealth", self.testutility.getName()))
+        # system input > utility
+        self.internalconnections.append( ( duplicatedInputNode, self.testutility.getName()   ))
 
 
     # set test utility based on costs defined in specs

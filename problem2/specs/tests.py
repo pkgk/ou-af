@@ -28,7 +28,7 @@ observeorreplacetest = {
 
 changeinputtest = {
         "name":"ChangeInputTest",
-        "typeUndertest":"Light",
+        "typeUndertest":"Multiple",
         "componentChain":{
             "start":"PresentPowerInputsSwitch",
             "end":"PresentLightOutputsLight"

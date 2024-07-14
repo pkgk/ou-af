@@ -514,6 +514,9 @@ class Oopn:
     def getSystemHealth(self):
         return self.systemhealth
     
+    def setSystemHealth(self, sh):
+        self.systemhealth = sh
+    
     
     def findComponentFromNodeName(self, nodename):
         foundcomp = None
