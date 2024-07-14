@@ -121,10 +121,19 @@ def addTests(diagram, oopn):
             if (node.getType() == "TestOutcome"):
                 print("adding cpt to: " + node.getName())
                 transferPotential(diagram, node)
-                
 
-def addSystemHealth(diagram.oopn):
-    pass 
+
+# method to add a sytemhealth variable to the diagram
+def addSystemHealth(diagram, oopn):
+    sh = oopn.getSystemHealth()
+    print("adding systemHealth variable: ")
+    diagram.addChanceNode(sh.getNode().getVariable())
+
+    print("adding systemhealth connections")
+    for healthnode in sh.getHealthNodes():
+        diagram.addArc(healthnode.getName(), sh.getName())
+
+
 
 #######################################################################
 # MAIN builder 
@@ -141,9 +150,11 @@ def diagramBuilder(diagram, oopn):
     setProbabilitiesComponents(diagram, oopn)
     setProbabilitiesConnections(diagram, oopn)
 
+    # voeg eventueel systemhealth toe
+    if (oopn.getSystemHealth() != None):
+        addSystemHealth(diagram, oopn)
+
     # add ObserveOrReplacetests
     addTests(diagram, oopn)
-
-    addSystemHealth(diagram.oopn)
 
     return diagram

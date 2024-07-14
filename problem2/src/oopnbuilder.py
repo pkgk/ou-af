@@ -1,6 +1,6 @@
 import pyAgrum as gum
 import re
-from src.oopnclasses import Component, Connection, Oopn, Node
+from src.oopnclasses import Component, Connection, Oopn, Node, SystemHealth
 from src.testobservereplace import ObserveOrReplaceTest
 from src.testchangeinput import ChangeInputTest
 
@@ -19,6 +19,7 @@ class OopnBuilder():
         self.components = []
         self.connections = []
         self.tests = []
+        self.systemhealth = None
 
         # create components, connections and tests
         self.createComponents()
@@ -27,6 +28,9 @@ class OopnBuilder():
         print("number of connections: " + str(len(self.connections)))
         self.createTests()
         print("number of tests: " + str(len(self.tests)))
+        if (self.assemblyspecs["structure"]["systemhealth"] == "yes"):
+            self.createSystemHealth()
+            print("added systemHealth")
 
 
     # helper to find a specification that matches a given type
@@ -108,6 +112,22 @@ class OopnBuilder():
                     if (testtype == "ChangeInputTest"):
                         self.createChangeInputTest(target, testtype, testspec)
 
+
+    def getHealthNodes(self):
+        healthnodes = []
+        for comp in self.components:
+            healthnode = comp.getHealthNode()
+            healthnodes.append(healthnode)
+        for conn in self.connections:
+            healthnode = conn.getHealthNode()
+            healthnodes.append(healthnode)
+        return healthnodes
+    
+    def createSystemHealth(self):
+        self.systemhealth = SystemHealth("systemhealth", self.getHealthNodes())
+        print(self.systemhealth)
+
+
     # create Oopn object to contain all compoonents, connects an tests and return it    
     def getOopn(self):
-        return Oopn(self.name, self.components, self.connections, self.tests)
+        return Oopn(self.name, self.components, self.connections, self.tests, self.systemhealth)

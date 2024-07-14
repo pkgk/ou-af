@@ -30,7 +30,8 @@ structure1 = {
             "startComponent":"Switch",
             "endComponent":"Light"
         }
-    }
+    },
+    "systemhealth":"yes"
 }
 
 # bigger structure with more components and connections

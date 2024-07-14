@@ -28,12 +28,40 @@ class Node:
         return self.variable
 
 
-
+# systemhealth bundles the healths of components into one overall systemhealth
+# elements are a name, a node (variable) and the healthnodes that the systemhealths
+# needs to be connected to
 class SystemHealth:
     def __init__(self, name, healthnodes):
-        self.name - name
-        
+        self.name = name
+        self.node = self.createNode()
+        self.healthnodes = healthnodes
+        self.calculatePrior()
 
+
+    def getName(self):
+        return self.name
+    
+    def getNode(self):
+        return self.node
+    
+    def getHealthNodes(self):
+        return self.healthnodes
+
+    # create node for system health
+    # todo: get values for state of variable from descriptions
+    def createNode(self):
+        return  Node(self.name, "Health", gum.LabelizedVariable(self.name, self.name, ["ok", "broken"]))
+
+    def calculatePrior(self):
+        # create the table, first the systemhealth node, then the other healths
+        x = self.node.getVariable()
+        p = gum.Potential().add(x)
+        for y in self.healthnodes:
+            p.add(y.getVariable())
+        self.node.setPrior(p)
+
+        
 
 # this class models a component in the system
 # the component is defined by it's name and specs (a dict)
@@ -446,12 +474,12 @@ class Connection:
 # oopn also support setting a system health variable
 
 class Oopn:
-    def __init__(self, name, components, connections, tests):
+    def __init__(self, name, components, connections, tests, systemhealth):
         self.name = name
         self.components = components
         self.connections = connections
         self.tests = tests
-        self.systemhealth = None
+        self.systemhealth = systemhealth
 
     def getName(self):
         return self.name
@@ -461,7 +489,9 @@ class Oopn:
         return self.connections
     def getTests(self):
         return self.tests
-
+    def getSystemHealth(self):
+        return self.systemhealth
+    
     
     def findComponentFromNodeName(self, nodename):
         foundcomp = None
@@ -499,9 +529,6 @@ class Oopn:
             connectionlist.append(con.getConnectionNodes())
         return connectionlist
     
-
-    def setSystemHealth(self):
-        pass
 
     # helper to copying components
     def determinePathStartToFinish(self, nodes, connections, start, finish):
