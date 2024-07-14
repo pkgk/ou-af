@@ -133,6 +133,14 @@ def addSystemHealth(diagram, oopn):
     for healthnode in sh.getHealthNodes():
         diagram.addArc(healthnode.getName(), sh.getName())
 
+    potentialoopn = sh.getNode().getPrior()
+    potentialdiagram =  diagram.cpt(diagram.idFromName(sh.getNode().getName())) 
+    if (potentialoopn.names == potentialdiagram.names):
+        potentialdiagram.fillWith((potentialoopn))
+    else:
+         print("potential node not identical to potential in diagram:" + str(sh.getNode().getName()))
+         print("diagram: " + str(potentialdiagram.names) + " oopn: " + str(potentialoopn.names))
+
 
 
 #######################################################################

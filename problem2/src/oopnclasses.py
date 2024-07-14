@@ -61,6 +61,28 @@ class SystemHealth:
             p.add(y.getVariable())
         self.node.setPrior(p)
 
+        # determine probabilities for table
+        for pindex in p.loopIn():  # pindex is a Instantiation
+            values = []
+            pid = pindex.todict()
+            for k in pid.keys():
+                if (k == self.name): 
+                    shvalue = pid[k]
+                else: values.append(pid[k])
+            res = all(ele == values[0] for ele in values)
+            if res == True:
+                if values[0] == "ok":
+                    if shvalue == "ok": p.set(pindex, 0.99)
+                    else: p.set(pindex, 0.01)
+                else:
+                    if shvalue == "ok": p.set(pindex, 0.01)
+                    else: p.set(pindex, 0.99)
+            else:   # res == False
+                if shvalue == "broken": p.set(pindex, 0.99)
+                else: p.set(pindex, 0.01)
+        self.node.setPrior(p)
+
+
         
 
 # this class models a component in the system
