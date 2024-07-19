@@ -99,7 +99,7 @@ class OopnBuilder():
         end = specs["componentChain"]["end"]
         # duplicate the nodes of the chain given in the specs
         self.oopn.copyPathType2Test(start, end)
-        self.tests.append(ChangeInputTest(name, targetcomponent, specs))
+        self.tests.append(ChangeInputTest(name, targetcomponent, specs, self.oopn))
 
 
     # create Test objects

@@ -527,6 +527,15 @@ class Oopn:
                     break
         return foundcomp
     
+    def findNodeFromName(self, nodename):
+        foundcomp = None
+        for comp in self.components:
+            for node in comp.getNodes():
+                if (nodename == node.getName()):
+                    foundcomp = comp
+                    return node
+        return None
+
     def addComponent(self, component):
         if (type(component) == Component):
             self.components.append(component)
