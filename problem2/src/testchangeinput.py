@@ -54,20 +54,22 @@ class ChangeInputTest:
 
     # create internal connections + interface with Output Node of target component
     def setInternalConnections(self):
-        duplicatedInputNode = self.specs["componentChain"]["start"] 
+        inputNode = self.specs["componentChain"]["start"] 
+        endNode = self.specs["componentChain"]["end"]
+        
         # decision > duplicated inputnode
-        self.internalconnections.append( (self.testdecision.getName(), duplicatedInputNode + self.duplicatedNodeExtension  ))
+        self.internalconnections.append( (self.testdecision.getName(), inputNode + self.duplicatedNodeExtension  ))
         # system outputnode > decision
-        self.internalconnections.append( (self.targetcomponent.getOutputNode().getName(), self.testdecision.getName() ))
+        self.internalconnections.append( (endNode, self.testdecision.getName() ))
         # duplicated inputnode > utility
-        self.internalconnections.append( (duplicatedInputNode + self.duplicatedNodeExtension , self.testutility.getName()))
-        self.utilityparents.append(duplicatedInputNode + self.duplicatedNodeExtension)
+        self.internalconnections.append( (inputNode + self.duplicatedNodeExtension , self.testutility.getName()))
+        self.utilityparents.append(inputNode + self.duplicatedNodeExtension)
         # systemhealth > utility
         self.internalconnections.append( ("systemhealth", self.testutility.getName()))
         self.utilityparents.append("systemhealth" )
         # system input > utility
-        self.internalconnections.append( ( duplicatedInputNode, self.testutility.getName()   ))
-        self.utilityparents.append(duplicatedInputNode)
+        self.internalconnections.append( ( inputNode, self.testutility.getName()   ))
+        self.utilityparents.append(inputNode)
 
 
     # set test utility based on costs defined in specs
@@ -88,8 +90,14 @@ class ChangeInputTest:
             pot.add(v )
             i.add(v)
 
-#        i.chgVal(al, 0)   # 0 = "yes"
-#        p = self.specs["TestUtility"]["testcosts"]
+        for v in vars:
+            if v.name() == "systemhealth":
+                i.chgVal(v, 0)
+            else: 
+                if v.labels()[0] == "yes":
+                    i.chgVal(v, 0)
+        print(i)
+        #        p = self.specs["TestUtility"]["testcosts"]
 #        pot.set(i, p)
         self.testutility.setPrior(pot) 
 
