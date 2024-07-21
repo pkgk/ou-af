@@ -59,6 +59,24 @@ testmapping5 = {
     }
 }
 
+testmapping6 = {
+    "1":{
+        "test":"ChangeInputTest",
+        "target":"Switch"
+    },
+    "2":{
+        "test":"ObserveOrReplaceTest",
+        "target":"Switch"
+    },
+    "3":{
+        "test":"ObserveOrReplaceTest",
+        "target":"Light"
+    },
+    "4":{
+        "test":"ObserveOrReplaceTest",
+        "target":"Wire"
+    }
+}
 
 
 testmappinglight = {
