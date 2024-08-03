@@ -66,7 +66,7 @@ light = {
             "modality":"Health",
             "property":"health",
             "propertyvalues":["ok","broken"],
-            "priorprobability":[0.8,0.01]
+            "priorprobability":[0.99,0.01]
         }
     },
     "Behavior":{
