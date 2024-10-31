@@ -17,4 +17,4 @@ De andere bestanden in de map src bevatten network classes voor het systeem en d
 notebooks:
 - "prototype and validate type II test" laat het basis design van een type II test als influence diagram zien. Het notebook bevat ook validatietesten.
 - "prototype type II test + ObserveTest + Replace" bevat een prototype waarin naast de type II test ook een observe test + een replace besluit zijn opgenomen
-- de notebook beginnend met "tryout" zijn gebruikt om een aantal zaken uit te zoeken
+- de notebooks beginnend met "tryout" zijn gebruikt om een aantal zaken uit te zoeken
